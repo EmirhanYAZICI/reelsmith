@@ -1,6 +1,6 @@
 ---
 name: whisper-tr
-description: Yerel ve ücretsiz Whisper (faster-whisper) ile Türkçe konuşmayı yazıya döker, kelime kelime zaman çıkarır (altyazı, sahne zamanlaması). API anahtarı istemez. Kullan - "whisper", "transkript", "konuşmayı yazıya dök", "altyazı zamanla", "kelime zamanları" denince ya da reelsmith skill'i seslendirmeyi zamanlarken.
+description: Yerel ve ücretsiz Whisper (faster-whisper) ile Türkçe konuşmayı yazıya döker, kelime kelime zaman çıkarır (altyazı, sahne zamanlaması). API anahtarı istemez. Kullan - "whisper", "transkript", "konuşmayı yazıya dök", "altyazı zamanla", "kelime zamanları" denince ya da reelsmith-media skill'i seslendirmeyi zamanlarken.
 argument-hint: "<ses ya da video dosyası> [özel isimler]"
 ---
 
@@ -35,5 +35,5 @@ export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
 
 ## Notlar
 - OpenMontage'ın kendi `transcriber` aracı bu sistemde PyAV hatası veriyor (`metadata_errors`). Bu script sesi ffmpeg ile çözdüğü için o hatayı aşar.
-- Yazım hatası olabilir. Doğru yazım için metni senaryoyla hizala: reelsmith skill'indeki `template/scripts/align.py`.
+- Yazım hatası olabilir. Doğru yazım için metni senaryoyla hizala: reelsmith-media skill'indeki `template/scripts/align.py`.
 - Daha doğru sonuç gerekirse script içinde `"small"` yerine `"medium"` ya da `"large-v3"` yaz. Daha yavaştır.

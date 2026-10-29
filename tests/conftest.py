@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-TEMPLATE = REPO / "skills" / "reelsmith" / "template"
+TEMPLATE = REPO / "skills" / "reelsmith-media" / "template"
 SCRIPTS = TEMPLATE / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 

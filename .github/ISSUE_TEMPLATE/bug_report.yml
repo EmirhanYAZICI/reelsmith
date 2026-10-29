@@ -9,7 +9,7 @@ body:
         Bildirdiğin için teşekkürler. Önce ön kontrolü çalıştır ve çıktısını aşağıya yapıştır.
 
         ```
-        python skills/reelsmith/template/scripts/check.py --src=<your folder>
+        python skills/reelsmith-media/template/scripts/check.py --src=<your folder>
         ```
         Do not paste API keys, private file paths you do not want public, or client media.
         API anahtarı, paylaşmak istemediğin dosya yolları ya da müşteri videosu yapıştırma.
@@ -65,4 +65,4 @@ body:
     id: versions
     attributes:
       label: Versions / Sürümler
-      placeholder: "Python 3.12, ffmpeg 8.1, HyperFrames 0.8.216, Reelsmith 1.3.2"
+      placeholder: "Python 3.12, ffmpeg 8.1, HyperFrames 0.8.216, Reelsmith Media 2.0.0"

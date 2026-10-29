@@ -74,10 +74,10 @@ jobs:
           ./install.sh --dry-run --skills-only --agents=all
           ./install.sh --skills-only --agents=all
           for d in ~/.claude/skills ~/.codex/skills ~/.config/opencode/skills ~/.cursor/skills ~/.gemini/antigravity/skills; do
-            test -f "$d/reelsmith/SKILL.md" && test -f "$d/whisper-tr/SKILL.md" && echo "ok $d"
+            test -f "$d/reelsmith-media/SKILL.md" && test -f "$d/whisper-tr/SKILL.md" && echo "ok $d"
           done
           mkdir -p /tmp/proj && cd /tmp/proj && "$GITHUB_WORKSPACE/install.sh" --skills-only --agents=claude,cursor --project
-          test -f .claude/skills/reelsmith/SKILL.md && test -f .cursor/skills/reelsmith/SKILL.md
+          test -f .claude/skills/reelsmith-media/SKILL.md && test -f .cursor/skills/reelsmith-media/SKILL.md
 
       - name: install.ps1 (parse, dry run, real skills install)
         if: runner.os == 'Windows'
@@ -89,7 +89,7 @@ jobs:
           .\install.ps1 -DryRun -SkillsOnly -Agents all
           .\install.ps1 -SkillsOnly -Agents all
           foreach ($d in '.claude\skills', '.codex\skills', '.config\opencode\skills', '.cursor\skills', '.gemini\antigravity\skills') {
-            foreach ($s in 'reelsmith', 'whisper-tr') {
+            foreach ($s in 'reelsmith-media', 'whisper-tr') {
               if (-not (Test-Path (Join-Path $HOME "$d\$s\SKILL.md"))) { throw "missing $d\$s" }
             }
             "ok $d"

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="t d">
-  <title id="t">Reelsmith</title>
+  <title id="t">Reelsmith Media</title>
   <desc id="d">An AI agent turns a folder (voiceover, scene clips, script, logo) into a captioned 1080x1920 Instagram Reel.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -88,7 +88,7 @@
   <rect width="1280" height="640" fill="url(#glow)"/>
 
   <!-- title -->
-  <text x="60" y="118" class="sans" font-size="68" font-weight="800" fill="#FFFFFF" letter-spacing="-1">Reelsmith</text>
+  <text x="60" y="118" class="sans" font-size="68" font-weight="800" fill="#FFFFFF" letter-spacing="-1">Reelsmith Media</text>
   <text x="62" y="166" class="sans" font-size="26" fill="#9FB3C8">Folder in. Instagram Reel out.</text>
 
   <g class="sans" font-size="15" font-weight="600">
@@ -113,7 +113,7 @@
 
     <g class="mono" font-size="17">
       <text x="84" y="342" fill="#D97757">&gt;</text>
-      <text x="104" y="342" fill="#E6EDF3">/reelsmith <tspan fill="#23F7DD">my-brand</tspan> reel.mp4</text>
+      <text x="104" y="342" fill="#E6EDF3">/reelsmith-media <tspan fill="#23F7DD">my-brand</tspan> reel.mp4</text>
       <rect class="type" x="102" y="324" width="480" height="26" fill="#0A0E13"/>
 
       <g font-size="15.5">

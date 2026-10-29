@@ -1,9 +1,9 @@
-# Reelsmith installer for Windows PowerShell.
+# Reelsmith Media installer for Windows PowerShell.
 #
 #   .\install.ps1                         install deps + skills for every agent found on this machine
 #   .\install.ps1 -Agents claude,cursor
 #   .\install.ps1 -Agents all -Project    install into the current project folder instead of your home
-#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.ps1)))
 #
 # Options:
 #   -Agents auto|all|claude,codex,opencode,cursor,antigravity   (default: auto = agents found on this machine)
@@ -14,7 +14,7 @@
 #   -NoBackup      replace changed skill folders without keeping a backup copy
 #   -DryRun        show what would happen, change nothing
 #
-# Existing reelsmith / whisper-tr folders are left alone when identical. When they differ,
+# Existing reelsmith-media / whisper-tr folders are left alone when identical. When they differ,
 # the old copy is moved to ~\.reelsmith-backups\<time>\<agent>\ before the new one is copied.
 # Python must be 3.10-3.12 (faster-whisper); other versions stop the install with a message.
 param(
@@ -28,9 +28,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
-$RepoUrl = 'https://github.com/EmirhanYAZICI/reelsmith'
+$RepoUrl = 'https://github.com/EmirhanYAZICI/reelsmith-media'
 $OmUrl = 'https://github.com/calesthio/OpenMontage'
-$Skills = @('reelsmith', 'whisper-tr')
+$Skills = @('reelsmith-media', 'whisper-tr')
 $AllAgents = @('claude', 'codex', 'opencode', 'cursor', 'antigravity')
 
 function Say($m) { Write-Host "`n== $m" }
@@ -53,9 +53,9 @@ function Run([scriptblock]$b) {
 
 # Repo source: the folder this script is in, or a fresh clone when run from the web.
 $Src = $PSScriptRoot
-if (-not $Src -or -not (Test-Path (Join-Path $Src 'skills\reelsmith\SKILL.md'))) {
-    $Src = if ($env:REELSMITH_HOME) { $env:REELSMITH_HOME } else { Join-Path $HOME '.reelsmith' }
-    Say "Getting Reelsmith into $Src"
+if (-not $Src -or -not (Test-Path (Join-Path $Src 'skills\reelsmith-media\SKILL.md'))) {
+    $Src = if ($env:REELSMITH_HOME) { $env:REELSMITH_HOME } else { Join-Path $HOME '.reelsmith-media' }
+    Say "Getting Reelsmith Media into $Src"
     if (Test-Path (Join-Path $Src '.git')) { Run { git -C $Src pull --ff-only } }
     else { $ref = if ($env:REELSMITH_REF) { $env:REELSMITH_REF } else { 'main' }; Run { git clone --depth 1 --branch $ref $RepoUrl $Src } }
 }
@@ -169,10 +169,21 @@ foreach ($a in $List) {
     $dir = AgentDir $a
     if (-not $dir) { Warn "unknown agent: $a"; continue }
     if (-not $DryRun) { New-Item -ItemType Directory -Force $dir | Out-Null }
+    $old = Join-Path $dir 'reelsmith'  # renamed to reelsmith-media in 2.0.0
+    if (Test-Path $old) {
+        $bak = Join-Path $BackupRoot "$a\reelsmith"
+        if ($DryRun) { Write-Host "   would $(if ($NoBackup) { 'delete' } else { "move to $bak" }): $old" }
+        elseif ($NoBackup) { Remove-Item -Recurse -Force $old }
+        else {
+            New-Item -ItemType Directory -Force (Split-Path $bak) | Out-Null
+            Move-Item $old $bak
+            Ok "$a/reelsmith is now reelsmith-media; the old folder was saved to $bak"
+        }
+    }
     foreach ($s in $Skills) { InstallSkill $a $dir $s }
     Ok "$a  ->  $dir"
 }
 
 Say 'Done'
-Write-Host '   Open your agent and type: /reelsmith <folder>'
+Write-Host '   Open your agent and type: /reelsmith-media <folder>'
 Write-Host '   Tools without skill support read AGENTS.md in this repo.'
