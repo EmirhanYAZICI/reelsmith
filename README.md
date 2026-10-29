@@ -95,18 +95,18 @@ Prefer to read the script before it runs, or want a fixed version? Download the 
 
 ```powershell
 # Windows (PowerShell)
-irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/reelsmith-media-v2.0.0.zip -OutFile reelsmith-media-v2.0.0.zip
-irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/SHA256SUMS.txt -OutFile SHA256SUMS.txt
-(Get-FileHash reelsmith-media-v2.0.0.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
-Expand-Archive reelsmith-media-v2.0.0.zip .; notepad reelsmith-media\install.ps1
+irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.1.0/reelsmith-media-v2.1.0.zip -OutFile reelsmith-media-v2.1.0.zip
+irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.1.0/SHA256SUMS.txt -OutFile SHA256SUMS.txt
+(Get-FileHash reelsmith-media-v2.1.0.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
+Expand-Archive reelsmith-media-v2.1.0.zip .; notepad reelsmith-media\install.ps1
 powershell -ExecutionPolicy Bypass -File reelsmith-media\install.ps1
 ```
 
 ```bash
 # macOS / Linux / Git Bash
-curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/reelsmith-media-v2.0.0.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/SHA256SUMS.txt
+curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.1.0/reelsmith-media-v2.1.0.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.1.0/SHA256SUMS.txt
 sha256sum -c SHA256SUMS.txt --ignore-missing      # macOS: shasum -a 256 -c SHA256SUMS.txt --ignore-missing
-unzip -q reelsmith-media-v2.0.0.zip && less reelsmith-media/install.sh
+unzip -q reelsmith-media-v2.1.0.zip && less reelsmith-media/install.sh
 ./reelsmith-media/install.sh
 ```
 
@@ -175,7 +175,7 @@ The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to
 
 ## How it works
 
-1. **Transcribes the voiceover locally with Whisper** (faster-whisper, Turkish by default). It produces word-level timestamps and needs no API key and no paid service.
+1. **Transcribes the voiceover locally with Whisper** (faster-whisper). Turkish by default; any Whisper language with `--language=en`, `de`, ... or `auto`. It produces word-level timestamps and needs no API key and no paid service.
 2. **Aligns the transcript to your script.** Captions use your spelling, not Whisper's guesses. Scene boundaries come from when each scene's text is actually spoken.
 3. **Fits every clip to its scene.**
    - Each ~10 s clip is slowed down to match the length of its narration.
@@ -196,7 +196,7 @@ The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to
 
 ### Captions: fixed placement, flexible look
 
-Captions always sit in the same place: Calibri Bold 75 px, 450 px from the bottom, centered. Only the look changes:
+Captions always sit in the same place: Calibri Bold (or the bundled Carlito Bold) 75 px, 450 px from the bottom, centered. Only the look changes:
 
 | Option | Default | Values |
 |---|---|---|
@@ -230,54 +230,11 @@ The logo is always used as uploaded: original colors, full opacity, no effects. 
 | Python packages | `faster-whisper`, `numpy` (see `requirements.txt`) |
 | Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes@0.8` (tested with 0.8.x) |
 | ffmpeg / ffprobe | Must be on `PATH` |
-| Calibri Bold font | Ships with Windows (`C:\Windows\Fonts\calibrib.ttf`). It is **not** included here for licensing reasons. On other systems pass `--font=<path>` |
+| Caption font | Nothing to install. Calibri Bold is used on Windows; on macOS and Linux the bundled Carlito Bold (same metrics as Calibri, open license) is used. Any other bold `.ttf` with `--font=<path>` |
 
 ## Install in detail
 
-### Installer options
-
-From a clone: `.\install.ps1` or `./install.sh`.
-
-| PowerShell | Bash | Effect |
-|---|---|---|
-| `-Agents claude,cursor` | `--agents=claude,cursor` | Pick agents (`auto` = found on this machine, `all`) |
-| `-Project` | `--project` | Install into the current project folder instead of your home |
-| `-OM <path>` | `--om=<path>` | OpenMontage location |
-| `-SkillsOnly` | `--skills-only` | Copy the skills only, skip dependencies |
-| `-NoBackup` | `--no-backup` | Replace changed skill folders without keeping a backup |
-| `-DryRun` | `--dry-run` | Show what would happen, change nothing |
-
-The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.10-3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It checks the real version of the Python it would use (and of an existing `.venv`), not just the command name. It only touches the `reelsmith-media` and `whisper-tr` folders in each skills folder: identical copies are left alone, changed ones are backed up first. An old `reelsmith` folder from version 1.x is moved to the backup folder too.
-
-### Manual install
-
-**1. Shared dependencies (once)**
-
-```bash
-OM=~/Projects/OpenMontage                      # wherever OpenMontage lives
-$OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
-npm i -g hyperframes@0.8
-npx hyperframes skills                         # official HyperFrames skills for your agents
-```
-
-If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` environment variable to its path.
-
-**2. The skills**
-
-Copy `skills/reelsmith-media` and `skills/whisper-tr` into your tool's skills folder:
-
-| Tool | Skills folder (user-wide / per project) |
-|---|---|
-| Claude Code | `~/.claude/skills/` / `.claude/skills/` |
-| OpenAI Codex | `~/.codex/skills/` / `.codex/skills/` |
-| OpenCode | `~/.config/opencode/skills/` / `.opencode/skills/` |
-| Cursor | `~/.cursor/skills/` / `.cursor/skills/` |
-| Google Antigravity | `~/.gemini/antigravity/skills/` / `.agent/skills/` |
-
-Folder names can change between tool versions. If a path does not work, check your tool's docs or use `npx skills add`.
-Tools that do not load skills still read [`AGENTS.md`](AGENTS.md), which points them to the right `SKILL.md`.
-
-To check the install in Claude Code, type `/`. You should see `reelsmith-media` and `whisper-tr`.
+All installer options, manual install and the skills folder of every agent: [`docs/INSTALL.md`](docs/INSTALL.md).
 
 ## Usage in detail
 
@@ -303,7 +260,7 @@ To run it by hand without an agent, see step 3 in [`skills/reelsmith-media/SKILL
 |---|---|
 | Vertical 1080x1920 at 30 fps | Other sizes or frame rates (16:9, 1:1, 60 fps) |
 | Any number of scenes, one or more clips per scene | Cutting clips on music beats (clips are fitted to the narration) |
-| Turkish voiceover out of the box | Other languages need a one-line change (`language="tr"` in `transcribe.py`) |
+| Any language Whisper supports (Turkish by default, `--language=en` and so on) | Automatic translation of the captions |
 | Windows (tested end to end); macOS and Linux run the installer and tests in CI | Rendering without Node.js / Chromium |
 | Agents with a local shell | ChatGPT or Claude web chat (no local shell) |
 | Editing clips you made | Generating clips, voiceover or translations |
@@ -369,6 +326,7 @@ This repository contains only its own code. The tools it runs are separate proje
 - [HyperFrames](https://www.npmjs.com/package/hyperframes): Apache-2.0
 - [faster-whisper](https://github.com/SYSTRAN/faster-whisper): MIT
 - FFmpeg: LGPL/GPL, depending on the build
+- Carlito Bold (`skills/reelsmith-media/template/fonts/`): SIL Open Font License 1.1, see [`OFL.txt`](skills/reelsmith-media/template/fonts/OFL.txt). It is the only third-party file in this repository.
 - Calibri is a Microsoft font and is not part of this repository.
 
 The demo video and images belong to Taş Galerisi and are not covered by the MIT license.
@@ -495,7 +453,7 @@ Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne 
 
 ### Nasıl çalışır
 
-1. **Seslendirmeyi yerel Whisper ile yazıya döker** (faster-whisper, varsayılan Türkçe). Kelime kelime zaman çıkarır. API anahtarı ya da ücretli servis gerekmez.
+1. **Seslendirmeyi yerel Whisper ile yazıya döker** (faster-whisper). Varsayılan Türkçe; `--language=en`, `de`, ... ya da `auto` ile Whisper'ın desteklediği her dil. Kelime kelime zaman çıkarır. API anahtarı ya da ücretli servis gerekmez.
 2. **Dökümü senin metninle hizalar.** Altyazı Whisper'ın yazımıyla değil, senin yazımınla çıkar. Sahne sınırları her sahnenin metninin gerçekten okunduğu ana göre belirlenir.
 3. **Her klibi kendi sahnesine uydurur.**
    - ~10 sn'lik her klip, o sahnenin konuşma süresine kadar yavaşlatılır.
@@ -516,7 +474,7 @@ Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne 
 
 ### Altyazı: yeri sabit, görünüşü seçilebilir
 
-Altyazı hep aynı yerdedir: Calibri Bold 75 px, alttan 450 px, ortalı. Sadece görünüş değişir:
+Altyazı hep aynı yerdedir: Calibri Bold (ya da repodaki Carlito Bold) 75 px, alttan 450 px, ortalı. Sadece görünüş değişir:
 
 | Seçenek | Varsayılan | Değerler |
 |---|---|---|
@@ -548,43 +506,11 @@ Logo hep yüklendiği gibi kullanılır: kendi rengi, tam opak, efektsiz. Cümle
 | Python paketleri | `faster-whisper`, `numpy` (bkz. `requirements.txt`) |
 | Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes@0.8` (0.8.x ile test edildi) |
 | ffmpeg / ffprobe | `PATH`'te olmalı |
-| Calibri Bold | Windows'ta hazır gelir (`C:\Windows\Fonts\calibrib.ttf`). Lisans gereği bu repoda **yok**. Başka sistemde `--font=<yol>` ver |
+| Altyazı fontu | Kurulum gerekmez. Windows'ta Calibri Bold, macOS ve Linux'ta repodaki Carlito Bold (Calibri ile aynı ölçüler, açık lisans) kullanılır. Başka bir kalın `.ttf` için `--font=<yol>` |
 
 ### Kurulum ayrıntıları
 
-Repo indirildiyse: `.\install.ps1` ya da `./install.sh`.
-
-| PowerShell | Bash | Etkisi |
-|---|---|---|
-| `-Agents claude,cursor` | `--agents=claude,cursor` | Ajanları seç (`auto` = bu bilgisayarda bulunanlar, `all` = hepsi) |
-| `-Project` | `--project` | Ana klasör yerine şu anki proje klasörüne kur |
-| `-OM <yol>` | `--om=<yol>` | OpenMontage'ın yeri |
-| `-SkillsOnly` | `--skills-only` | Sadece skill'leri kopyala, bağımlılıkları atla |
-| `-NoBackup` | `--no-backup` | Değişmiş skill klasörlerini yedeksiz değiştir |
-| `-DryRun` | `--dry-run` | Ne yapacağını göster, hiçbir şeyi değiştirme |
-
-Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.10-3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Kullanacağı Python'un (ve varsa mevcut `.venv`'in) gerçek sürümünü kontrol eder. Skill klasörlerinde sadece `reelsmith-media` ve `whisper-tr` klasörlerine dokunur: aynıysa bırakır, farklıysa önce yedekler. 1.x sürümünden kalan eski `reelsmith` klasörü de yedek klasörüne taşınır.
-
-**Elle kurulum**
-
-```bash
-OM=~/Projects/OpenMontage                      # OpenMontage nerede ise
-$OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
-npm i -g hyperframes@0.8
-npx hyperframes skills                         # resmi HyperFrames skill'leri
-```
-
-OpenMontage `~/Projects/OpenMontage` dışında bir yerdeyse `OPENMONTAGE_DIR` ortam değişkenine yolunu yaz. Sonra `skills/reelsmith-media` ve `skills/whisper-tr` klasörlerini aracının skill klasörüne kopyala:
-
-| Araç | Skill klasörü (kullanıcı geneli / proje) |
-|---|---|
-| Claude Code | `~/.claude/skills/` / `.claude/skills/` |
-| OpenAI Codex | `~/.codex/skills/` / `.codex/skills/` |
-| OpenCode | `~/.config/opencode/skills/` / `.opencode/skills/` |
-| Cursor | `~/.cursor/skills/` / `.cursor/skills/` |
-| Google Antigravity | `~/.gemini/antigravity/skills/` / `.agent/skills/` |
-
-Araç skill yüklemiyorsa bile [`AGENTS.md`](AGENTS.md) dosyasını okur; o dosya ajanı doğru `SKILL.md`'ye yönlendirir. Claude Code'da kontrol için `/` yaz. Listede `reelsmith-media` ve `whisper-tr` görünmeli.
+Kurulum aracının bütün seçenekleri, elle kurulum ve her ajanın skill klasörü: [`docs/INSTALL.md`](docs/INSTALL.md#kurulum-ayrıntıları).
 
 ### Kullanım ayrıntıları
 
@@ -610,7 +536,7 @@ Ajan olmadan elle çalıştırmak için [`skills/reelsmith-media/SKILL.md`](skil
 |---|---|
 | Dikey 1080x1920, 30 fps | Başka boyut ya da fps (16:9, 1:1, 60 fps) |
 | İstediğin kadar sahne, sahne başına bir ya da daha fazla klip | Klipleri müzik vuruşuna göre kesmek (klipler anlatıma göre ayarlanır) |
-| Türkçe seslendirme (hazır) | Başka dil için tek satır değişiklik gerekir (`transcribe.py` içinde `language="tr"`) |
+| Whisper'ın desteklediği her dil (varsayılan Türkçe, `--language=en` vb.) | Altyazıların otomatik çevirisi |
 | Windows (uçtan uca test edildi); macOS ve Linux'ta kurulum ve testler CI'da çalışır | Node.js / Chromium olmadan render |
 | Yerel terminali olan ajanlar | ChatGPT ya da Claude web sohbeti (yerel terminal yok) |
 | Senin ürettiğin klipleri kurgulamak | Klip, seslendirme ya da çeviri üretmek |
@@ -653,6 +579,6 @@ Skill gerçek bir projede kurulup test edildi: Taş Galerisi için "Zebercet" ta
 
 MIT, bkz. [`LICENSE`](LICENSE). Bu kodu ticari işler dahil kullanabilir, değiştirebilir ve paylaşabilirsin; telif notunu koruman yeterli.
 
-Bu repo yalnızca kendi kodunu içerir. Çalıştırdığı araçlar kendi lisansları olan ayrı projelerdir ve buraya dahil edilmez: OpenMontage (AGPL-3.0), HyperFrames (Apache-2.0), faster-whisper (MIT), FFmpeg (derlemeye göre LGPL/GPL). Calibri Microsoft'un fontudur ve bu repoda yoktur.
+Bu repo yalnızca kendi kodunu içerir. Çalıştırdığı araçlar kendi lisansları olan ayrı projelerdir ve buraya dahil edilmez: OpenMontage (AGPL-3.0), HyperFrames (Apache-2.0), faster-whisper (MIT), FFmpeg (derlemeye göre LGPL/GPL). Repodaki tek dış dosya Carlito Bold fontu: SIL Open Font License 1.1, bkz. [`OFL.txt`](skills/reelsmith-media/template/fonts/OFL.txt). Calibri Microsoft'un fontudur ve bu repoda yoktur.
 
 Demo video ve görseller Taş Galerisi'ne aittir ve MIT lisansının kapsamında değildir.

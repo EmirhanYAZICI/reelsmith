@@ -2,7 +2,7 @@
 
 Kullanım:
   python check.py --src=<kaynak klasör> [--script=metin.txt] [--vo=ses.mp3] [--logo=logo.png]
-                  [--font=calibrib.ttf] [--tools-only | --skip-tools] [--json]
+                  [--font=<bold .ttf>] [--tools-only | --skip-tools] [--json]
                   [--caption-*=...] [--logo-mode=...] (seçenekleri de doğrular)
 
 Her satır OK / WARN / FAIL. FAIL varsa çıkış kodu 1 olur; WARN render'ı durdurmaz.
@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from common import (AUDIO_EXT, OptionError, caption_options, group_clips, logo_options,  # noqa: E402
+from common import (AUDIO_EXT, OptionError, caption_font, caption_options, group_clips, logo_options,  # noqa: E402
                     scene_number, scene_texts)
 
 GUIDE_NAMES = re.compile(r"rehber|guide|readme|agents|claude", re.I)
@@ -188,7 +188,7 @@ def check_folder(src: Path) -> None:
                 warn(f"logo {logo.name} has no transparency; it will show as a box / şeffaf değil")
 
     # font
-    font = Path(opt("font", r"C:\Windows\Fonts\calibrib.ttf"))
+    font = caption_font(opt("font"))
     if font.is_file():
         ok(f"font {font.name}")
     else:

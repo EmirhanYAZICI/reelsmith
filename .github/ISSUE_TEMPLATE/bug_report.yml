@@ -65,4 +65,4 @@ body:
     id: versions
     attributes:
       label: Versions / Sürümler
-      placeholder: "Python 3.12, ffmpeg 8.1, HyperFrames 0.8.216, Reelsmith Media 2.0.0"
+      placeholder: "Python 3.12, ffmpeg 8.1, HyperFrames 0.8.216, Reelsmith Media 2.1.0"
