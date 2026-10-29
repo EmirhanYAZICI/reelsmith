@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="t d">
+  <title id="t">Reelsmith</title>
+  <desc id="d">An AI agent turns a folder (voiceover, scene clips, script, logo) into a captioned 1080x1920 Instagram Reel.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05080C"/>
+      <stop offset="1" stop-color="#0D141C"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.45" r="0.5">
+      <stop offset="0" stop-color="#23F7DD" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#23F7DD" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#FFFFFF" stroke-opacity="0.035"/>
+    </pattern>
+    <linearGradient id="sceneA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C9A27A"/>
+      <stop offset="0.55" stop-color="#7A5638"/>
+      <stop offset="1" stop-color="#2B1B10"/>
+    </linearGradient>
+    <linearGradient id="sceneB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7FB4C9"/>
+      <stop offset="0.55" stop-color="#2E5568"/>
+      <stop offset="1" stop-color="#0B1A22"/>
+    </linearGradient>
+    <linearGradient id="sceneC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E6B9A0"/>
+      <stop offset="0.55" stop-color="#8A4B3C"/>
+      <stop offset="1" stop-color="#2A1210"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.45" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.65"/>
+    </linearGradient>
+    <clipPath id="screen"><rect x="974" y="54" width="272" height="532" rx="28"/></clipPath>
+    <clipPath id="term"><rect x="60" y="268" width="600" height="312" rx="14"/></clipPath>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <style>
+    .sans { font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .mono { font-family: 'Cascadia Code', 'JetBrains Mono', Consolas, Menlo, monospace; }
+    .cap  { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 800; paint-order: stroke; stroke: #000; stroke-width: 7px; stroke-linejoin: round; }
+
+    /* 12 s loop */
+    .type  { animation: type 12s steps(30, end) infinite; }
+    @keyframes type { 0% { transform: translateX(0); } 12%, 100% { transform: translateX(470px); } }
+    .l1 { animation: l1 12s infinite; } @keyframes l1 { 0%, 15% { opacity: 0; } 17%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .l2 { animation: l2 12s infinite; } @keyframes l2 { 0%, 23% { opacity: 0; } 25%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .l3 { animation: l3 12s infinite; } @keyframes l3 { 0%, 31% { opacity: 0; } 33%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .l4 { animation: l4 12s infinite; } @keyframes l4 { 0%, 39% { opacity: 0; } 41%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .l5 { animation: l5 12s infinite; } @keyframes l5 { 0%, 47% { opacity: 0; } 49%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .l6 { animation: l6 12s infinite; } @keyframes l6 { 0%, 55% { opacity: 0; } 57%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+    .cursor { animation: blink 1s steps(1) infinite; } @keyframes blink { 50% { opacity: 0; } }
+
+    .flow { stroke-dasharray: 4 10; animation: flow 1s linear infinite; } @keyframes flow { to { stroke-dashoffset: -14; } }
+
+    .zoom { transform-origin: 1110px 320px; animation: zoom 12s ease-in-out infinite; }
+    @keyframes zoom { 0% { transform: scale(1); } 33% { transform: scale(1.08); } 34% { transform: scale(1); } 66% { transform: scale(1.08); } 67% { transform: scale(1); } 100% { transform: scale(1.08); } }
+    .sB { animation: sB 12s infinite; } @keyframes sB { 0%, 30% { opacity: 0; } 34%, 100% { opacity: 1; } }
+    .sC { animation: sC 12s infinite; } @keyframes sC { 0%, 63% { opacity: 0; } 67%, 97% { opacity: 1; } 100% { opacity: 0; } }
+
+    .w { opacity: 0; transform-box: fill-box; transform-origin: center; }
+    .w1 { animation: w1 12s infinite; } @keyframes w1 { 0%, 4% { opacity: 0; transform: scale(.55); } 6% { opacity: 1; transform: scale(1.12); } 8%, 28% { opacity: 1; transform: scale(1); } 30%, 100% { opacity: 0; } }
+    .w2 { animation: w2 12s infinite; } @keyframes w2 { 0%, 37% { opacity: 0; transform: scale(.55); } 39% { opacity: 1; transform: scale(1.12); } 41%, 61% { opacity: 1; transform: scale(1); } 63%, 100% { opacity: 0; } }
+    .w3 { animation: w3 12s infinite; } @keyframes w3 { 0%, 70% { opacity: 0; transform: scale(.55); } 72% { opacity: 1; transform: scale(1.12); } 74%, 95% { opacity: 1; transform: scale(1); } 97%, 100% { opacity: 0; } }
+
+    .logo { animation: logo 12s ease-in-out infinite; }
+    @keyframes logo {
+      0%   { transform: translate(0px, 0px); }
+      33%  { transform: translate(176px, -444px); }
+      66%  { transform: translate(176px, 0px); }
+      100% { transform: translate(0px, -444px); }
+    }
+    .bar { transform-box: fill-box; transform-origin: left; animation: bar 12s linear infinite; }
+    @keyframes bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  </style>
+
+  <!-- background -->
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+
+  <!-- title -->
+  <text x="60" y="118" class="sans" font-size="68" font-weight="800" fill="#FFFFFF" letter-spacing="-1">Reelsmith</text>
+  <text x="62" y="166" class="sans" font-size="26" fill="#9FB3C8">Folder in. Instagram Reel out.</text>
+
+  <g class="sans" font-size="15" font-weight="600">
+    <rect x="60" y="196" width="160" height="34" rx="17" fill="#D97757" fill-opacity="0.14" stroke="#D97757"/>
+    <text x="140" y="218" text-anchor="middle" fill="#F0A584">Claude Code skill</text>
+    <rect x="232" y="196" width="138" height="34" rx="17" fill="#23F7DD" fill-opacity="0.08" stroke="#23F7DD" stroke-opacity="0.7"/>
+    <text x="301" y="218" text-anchor="middle" fill="#7FFBEA">Local Whisper</text>
+    <rect x="382" y="196" width="130" height="34" rx="17" fill="#88CE02" fill-opacity="0.08" stroke="#88CE02" stroke-opacity="0.7"/>
+    <text x="447" y="218" text-anchor="middle" fill="#B5E86A">HyperFrames</text>
+    <rect x="524" y="196" width="88" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.05" stroke="#FFFFFF" stroke-opacity="0.35"/>
+    <text x="568" y="218" text-anchor="middle" fill="#D7DEE6">ffmpeg</text>
+  </g>
+
+  <!-- terminal -->
+  <g clip-path="url(#term)">
+    <rect x="60" y="268" width="600" height="312" fill="#0A0E13"/>
+    <rect x="60" y="268" width="600" height="38" fill="#141B23"/>
+    <circle cx="84" cy="287" r="6" fill="#FF5F57"/>
+    <circle cx="104" cy="287" r="6" fill="#FEBC2E"/>
+    <circle cx="124" cy="287" r="6" fill="#28C840"/>
+    <text x="360" y="292" text-anchor="middle" class="sans" font-size="14" fill="#7C8A99">Claude Code  ~/Desktop</text>
+
+    <g class="mono" font-size="17">
+      <text x="84" y="342" fill="#D97757">&gt;</text>
+      <text x="104" y="342" fill="#E6EDF3">/reelsmith <tspan fill="#23F7DD">my-brand</tspan> reel.mp4</text>
+      <rect class="type" x="102" y="324" width="480" height="26" fill="#0A0E13"/>
+
+      <g font-size="15.5">
+        <g class="l1"><text x="104" y="384" fill="#7C8A99">whisper</text><text x="204" y="384" fill="#C9D4DF">voiceover to word timestamps</text><text x="636" y="384" text-anchor="end" fill="#3FD07A">ok</text></g>
+        <g class="l2"><text x="104" y="414" fill="#7C8A99">align</text><text x="204" y="414" fill="#C9D4DF">6 scenes matched to script</text><text x="636" y="414" text-anchor="end" fill="#3FD07A">ok</text></g>
+        <g class="l3"><text x="104" y="444" fill="#7C8A99">clips</text><text x="204" y="444" fill="#C9D4DF">smooth slow-mo, 9:16 crop</text><text x="636" y="444" text-anchor="end" fill="#3FD07A">ok</text></g>
+        <g class="l4"><text x="104" y="474" fill="#7C8A99">edit</text><text x="204" y="474" fill="#C9D4DF">captions, moving logo, grain</text><text x="636" y="474" text-anchor="end" fill="#3FD07A">ok</text></g>
+        <g class="l5"><text x="104" y="504" fill="#7C8A99">audio</text><text x="204" y="504" fill="#C9D4DF">ducking, -14 LUFS, limiter</text><text x="636" y="504" text-anchor="end" fill="#3FD07A">ok</text></g>
+        <g class="l6"><text x="104" y="544" fill="#23F7DD">render</text><text x="204" y="544" fill="#FFFFFF" font-weight="700">1080x1920  30 fps  reel.mp4</text><rect class="cursor" x="490" y="530" width="9" height="18" fill="#23F7DD"/></g>
+      </g>
+    </g>
+  </g>
+  <rect x="60.5" y="268.5" width="599" height="311" rx="14" fill="none" stroke="#FFFFFF" stroke-opacity="0.1"/>
+
+  <!-- folder -->
+  <g class="mono" font-size="14">
+    <path d="M700 92h70l12 14h118a10 10 0 0 1 10 10v276a10 10 0 0 1-10 10H700a10 10 0 0 1-10-10V102a10 10 0 0 1 10-10z" fill="#111922" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <text x="708" y="132" class="sans" font-size="15" font-weight="700" fill="#E6EDF3">my-brand/</text>
+    <g fill="#C9D4DF">
+      <rect x="708" y="152" width="10" height="12" rx="2" fill="#B79CFF"/><text x="728" y="163">voiceover.mp3</text>
+      <rect x="708" y="190" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="201">1sahne.mp4</text>
+      <rect x="708" y="228" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="239">2sahne.mp4</text>
+      <rect x="708" y="266" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="277">3sahne.mp4</text>
+      <rect x="708" y="304" width="10" height="12" rx="2" fill="#F8D85A"/><text x="728" y="315">script.txt</text>
+      <rect x="708" y="342" width="10" height="12" rx="2" fill="#FFFFFF"/><text x="728" y="353">logo.png</text>
+    </g>
+  </g>
+
+  <!-- flow: folder to phone -->
+  <path class="flow" d="M910 248 C 935 248, 935 320, 958 320" fill="none" stroke="#23F7DD" stroke-width="3" stroke-linecap="round"/>
+  <path d="M952 313 L962 320 L952 327" fill="none" stroke="#23F7DD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- output specs -->
+  <g class="sans" font-size="14" fill="#9FB3C8">
+    <rect x="690" y="428" width="220" height="152" rx="12" fill="#0E151D" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <text x="708" y="458" font-weight="700" fill="#E6EDF3">Output</text>
+    <text x="708" y="486">1080 x 1920  ·  30 fps</text>
+    <text x="708" y="510">H.264 High + AAC</text>
+    <text x="708" y="534">-14 LUFS  ·  peak -1 dBFS</text>
+    <text x="708" y="558">No API keys, runs locally</text>
+  </g>
+
+  <!-- phone -->
+  <rect x="960" y="40" width="300" height="560" rx="40" fill="#1A222B" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="2"/>
+  <g clip-path="url(#screen)">
+    <g class="zoom">
+      <rect x="974" y="54" width="272" height="532" fill="url(#sceneA)"/>
+      <circle cx="1060" cy="190" r="70" fill="#FFE2B8" opacity="0.35" filter="url(#soft)"/>
+      <path d="M974 420 L1040 330 L1090 380 L1150 300 L1246 410 L1246 586 L974 586z" fill="#3A2616" opacity="0.8"/>
+      <g class="sB">
+        <rect x="974" y="54" width="272" height="532" fill="url(#sceneB)"/>
+        <circle cx="1160" cy="170" r="60" fill="#D8F3FF" opacity="0.35" filter="url(#soft)"/>
+        <path d="M974 440 Q1060 380 1130 430 T1246 400 L1246 586 L974 586z" fill="#0F2731" opacity="0.85"/>
+      </g>
+      <g class="sC">
+        <rect x="974" y="54" width="272" height="532" fill="url(#sceneC)"/>
+        <circle cx="1080" cy="220" r="80" fill="#FFD3BF" opacity="0.3" filter="url(#soft)"/>
+        <path d="M1000 586 L1000 360 Q1040 300 1080 360 L1080 586z M1110 586 L1110 330 Q1160 260 1210 330 L1210 586z" fill="#2E1510" opacity="0.75"/>
+      </g>
+    </g>
+    <rect x="974" y="54" width="272" height="532" fill="url(#shade)"/>
+    <rect x="974" y="54" width="272" height="532" filter="url(#grain)" opacity="0.07"/>
+
+    <!-- captions -->
+    <g text-anchor="middle" font-size="34">
+      <text class="cap w w1" x="1110" y="430" fill="#F8D85A">FOLDER IN</text>
+      <text class="cap w w2" x="1110" y="430" fill="#F8D85A">CAPTIONS</text>
+      <text class="cap w w3" x="1110" y="430" fill="#F8D85A">REEL OUT</text>
+    </g>
+
+    <!-- moving logo watermark -->
+    <g class="logo">
+      <rect x="990" y="530" width="64" height="26" rx="5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="1022" y="548" text-anchor="middle" class="sans" font-size="13" font-weight="800" fill="#FFFFFF" letter-spacing="2">LOGO</text>
+    </g>
+
+    <!-- progress -->
+    <rect x="974" y="580" width="272" height="6" fill="#FFFFFF" fill-opacity="0.15"/>
+    <rect class="bar" x="974" y="580" width="272" height="6" fill="#23F7DD"/>
+  </g>
+  <rect x="1070" y="62" width="80" height="8" rx="4" fill="#05080C"/>
+</svg>

@@ -1,12 +1,108 @@
-# Reelsmith
+<div align="center">
 
-An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.
-Works with Claude Code, Cursor, OpenAI Codex, OpenCode, Google Antigravity and other tools that support the open `SKILL.md` format.
+<img src="assets/banner.svg" width="100%" alt="Reelsmith: an AI agent turns a folder with a voiceover, scene clips, a script and a logo into a captioned 1080x1920 Instagram Reel"/>
 
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=23F7DD&center=true&vCenter=true&width=700&lines=Folder+in.+Instagram+Reel+out.;Local+Whisper+captions%2C+no+API+keys;Works+with+Claude+Code%2C+Codex%2C+Cursor%2C+OpenCode%2C+Antigravity" alt="Folder in. Instagram Reel out."/>
+
+<a href="#quick-start"><img src="https://img.shields.io/badge/Claude_Code-Skill_%2B_Plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code skill and plugin"/></a>
+<a href="#quick-start"><img src="https://img.shields.io/badge/Agent_Skills-SKILL.md-23F7DD?style=for-the-badge&labelColor=000000" alt="Open SKILL.md format"/></a>
+<img src="https://img.shields.io/badge/Whisper-local-412991?style=for-the-badge&logo=openai&logoColor=white" alt="Local Whisper"/>
+<img src="https://img.shields.io/badge/HyperFrames-GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=black" alt="HyperFrames"/>
+<img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg"/>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=000000" alt="MIT License"/></a>
+
+An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.<br/>
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
-Claude Code, Cursor, OpenAI Codex, OpenCode, Google Antigravity ve açık `SKILL.md` formatını destekleyen diğer araçlarla çalışır.
 
-**English** | [Türkçe](#türkçe)
+[Quick start](#quick-start) · [English](#english) · [Türkçe](#türkçe) · [Hızlı başlangıç](#hızlı-başlangıç)
+
+</div>
+
+---
+
+## Quick start
+
+**1. Install everything with one command.** It sets up the tools and copies the skills into every agent it finds on your machine.
+
+```powershell
+# Windows (PowerShell)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+```
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+```
+
+**2. Or install for one agent only.**
+
+| Agent | Install | Then |
+|---|---|---|
+| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith`<br/>`/plugin install reelsmith@reelsmith` | Type `/reelsmith my-brand` |
+| **OpenAI Codex CLI** | installer with `-Agents codex` / `--agents=codex` | Ask: *use the reelsmith skill on my-brand* |
+| **Cursor** | installer with `-Agents cursor` / `--agents=cursor` | Ask in Agent chat: *use the reelsmith skill on my-brand* |
+| **OpenCode** | installer with `-Agents opencode` / `--agents=opencode` | Ask: *use the reelsmith skill on my-brand* |
+| **Google Antigravity** | installer with `-Agents antigravity` / `--agents=antigravity` | Ask: *use the reelsmith skill on my-brand* |
+| **Any other agent** | `npx skills add EmirhanYAZICI/reelsmith` | It reads [`AGENTS.md`](AGENTS.md) if it has no skill support |
+
+For one agent with the installer: `.\install.ps1 -Agents codex` or `./install.sh --agents=codex` (from a clone of this repo).
+
+**3. Make a Reel.** Put your files in a folder on the Desktop and call the skill:
+
+```
+my-brand/
+├── voiceover.mp3      the narration
+├── 1sahne.mp4         scene 1 clip   (2sahne.mp4, 3sahne.mp4 ...)
+├── script.txt         the text of each scene
+└── logo.png           your logo, used as the moving watermark
+```
+
+```
+/reelsmith my-brand reel.mp4 white text, box style, word by word
+```
+
+The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it. No API keys are needed. Everything runs on your machine.
+
+## Hızlı başlangıç
+
+**1. Her şeyi tek komutla kur.** Gerekli araçları hazırlar ve skill'leri bilgisayarında bulduğu her ajana kopyalar.
+
+```powershell
+# Windows (PowerShell)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+```
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+```
+
+**2. Ya da sadece tek bir ajana kur.**
+
+| Ajan | Kurulum | Sonra |
+|---|---|---|
+| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith`<br/>`/plugin install reelsmith@reelsmith` | `/reelsmith markam` yaz |
+| **OpenAI Codex CLI** | kurulum aracı `-Agents codex` / `--agents=codex` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
+| **Cursor** | kurulum aracı `-Agents cursor` / `--agents=cursor` | Agent sohbetinde yaz: *markam klasöründe reelsmith skill'ini kullan* |
+| **OpenCode** | kurulum aracı `-Agents opencode` / `--agents=opencode` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
+| **Google Antigravity** | kurulum aracı `-Agents antigravity` / `--agents=antigravity` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
+| **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith` | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
+
+**3. Reels'i yap.** Dosyaları Masaüstünde bir klasöre koy ve skill'i çağır:
+
+```
+markam/
+├── seslendirme.mp3    anlatım sesi
+├── 1sahne.mp4         1. sahne videosu   (2sahne.mp4, 3sahne.mp4 ...)
+├── metin.txt          her sahnenin metni
+└── logo.png           logon, video boyunca köşeden köşeye gezer
+```
+
+```
+/reelsmith markam reels.mp4 beyaz yazı, kutulu, kelime kelime hoplasın
+```
+
+Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne kaydedilir. API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 ---
 
@@ -72,19 +168,9 @@ No API keys are needed. Everything runs locally.
 
 ### Install
 
-**Quick install (recommended)**
+**Installer (recommended)**
 
-One command checks the tools, gets OpenMontage, creates its Python 3.12 environment, installs `faster-whisper`, HyperFrames and its skills, and copies the skills into every agent it finds (Claude Code, Codex, OpenCode, Cursor, Antigravity).
-
-```powershell
-# Windows (PowerShell)
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
-```
-
-```bash
-# macOS / Linux / Git Bash
-curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
-```
+The one-command installer in [Quick start](#quick-start) checks the tools, gets OpenMontage, creates its Python 3.12 environment, installs `faster-whisper`, HyperFrames and its skills, and copies the skills into every agent it finds (Claude Code, Codex, OpenCode, Cursor, Antigravity).
 
 From a clone: `.\install.ps1` or `./install.sh`. Options:
 
@@ -165,6 +251,7 @@ To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests |
 | `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
 | `install.ps1`, `install.sh` | One-command installer (Windows / macOS, Linux, Git Bash) |
+| `assets/` | Banner (`banner.svg`) and social preview image |
 
 ### Origin
 
@@ -234,19 +321,9 @@ API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 ### Kurulum
 
-**Hızlı kurulum (önerilen)**
+**Kurulum aracı (önerilen)**
 
-Tek komut araçları kontrol eder, OpenMontage'ı indirir, Python 3.12 ortamını kurar, `faster-whisper`, HyperFrames ve skill'lerini yükler. Sonra skill'leri bilgisayarda bulduğu her ajana kopyalar (Claude Code, Codex, OpenCode, Cursor, Antigravity).
-
-```powershell
-# Windows (PowerShell)
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
-```
-
-```bash
-# macOS / Linux / Git Bash
-curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
-```
+[Hızlı başlangıç](#hızlı-başlangıç) bölümündeki tek komut araçları kontrol eder, OpenMontage'ı indirir, Python 3.12 ortamını kurar, `faster-whisper`, HyperFrames ve skill'lerini yükler. Sonra skill'leri bilgisayarda bulduğu her ajana kopyalar (Claude Code, Codex, OpenCode, Cursor, Antigravity).
 
 Repo indirildiyse: `.\install.ps1` ya da `./install.sh`. Seçenekler yukarıdaki İngilizce tabloda (`-Agents`, `-Project`, `-OM`, `-SkillsOnly`, `-DryRun`).
 
