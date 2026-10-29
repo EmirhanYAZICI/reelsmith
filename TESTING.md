@@ -29,6 +29,11 @@ Checked by hand on Windows 11 with both `install.ps1` and `install.sh` (Git Bash
 
 CI (`.github/workflows/ci.yml`) repeats the install on Windows, macOS and Ubuntu and checks that every agent folder received both skills.
 
+## CI
+
+Every push runs the tests on Windows and Ubuntu and the installers on Windows, macOS and Ubuntu.
+The first CI run caught a real bug: newer ffmpeg builds (Windows runner) removed `-filter_complex_script`, so the audio mix failed. Fixed in `b4be58a` by choosing `-/filter_complex` on ffmpeg 7+; all five jobs pass since.
+
 ## End-to-end render
 
 | Project | Machine | Result |
