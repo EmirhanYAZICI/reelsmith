@@ -1,7 +1,10 @@
 # Reelsmith
 
-A Claude Code skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.
-Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten Claude Code skill'i.
+An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.
+Works with Claude Code, Cursor, OpenAI Codex, OpenCode, Google Antigravity and other tools that support the open `SKILL.md` format.
+
+Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
+Claude Code, Cursor, OpenAI Codex, OpenCode, Google Antigravity ve açık `SKILL.md` formatını destekleyen diğer araçlarla çalışır.
 
 **English** | [Türkçe](#türkçe)
 
@@ -11,7 +14,7 @@ Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten Cl
 
 ### What it does
 
-You put a voiceover, numbered scene clips, a scene script and your logo in a folder. Then you type one command:
+You put a voiceover, numbered scene clips, a scene script and your logo in a folder. Then you ask your agent:
 
 ```
 /reelsmith my-folder my_reel.mp4
@@ -44,21 +47,21 @@ It works for any brand. The logo you drop in the folder is the brand.
 
 Captions always sit in the same place: Calibri Bold 75 px, 450 px from the bottom, centered. Only three things change:
 
-| Option | Values |
-|---|---|
-| `--renk` (color) | `sari` (yellow, default), `beyaz`, `yesil`, `altin`, `turuncu`, `kirmizi`, `pembe`, `mavi`, `mor`, `siyah`, or any `#RRGGBB` |
-| `--kontur` (outline color) | same list, default black |
-| `--stil` (text style) | `outline` (default), `box`, `shadow`, `double` |
-| `--anim` (entry animation) | `pop` (default), `hop`, `word-hop` (each word jumps in exactly when it is spoken), `bounce`, `wave` |
+| Option | Default | Values |
+|---|---|---|
+| `--caption-color` | `yellow` | `yellow`, `white`, `green`, `gold`, `orange`, `red`, `pink`, `blue`, `purple`, `black`, or any `#RRGGBB` |
+| `--caption-outline` | `#000000` | same list (outline / shadow color) |
+| `--caption-style` | `outline` | `outline`, `box`, `shadow`, `double` |
+| `--caption-anim` | `pop` | `pop`, `hop`, `word-hop` (each word jumps in exactly when it is spoken), `bounce`, `wave` |
 
-When you run it through Claude, you can describe the captions in plain words, for example: `/reelsmith my-folder white text, boxed, words hop in one by one`.
-See [`ALTYAZI-STILLERI.md`](ALTYAZI-STILLERI.md) for the full list and ready-made combinations.
+Through an agent, you can describe the captions in plain words, for example: `/reelsmith my-folder white text, boxed, words hop in one by one`.
+See [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md) for the full list and ready-made presets.
 
 ### Requirements
 
 | Tool | Notes |
 |---|---|
-| [Claude Code](https://claude.com/claude-code) | Runs the skill |
+| An agent with a local shell | Claude Code, Cursor, Codex CLI, OpenCode, Antigravity... Web chat apps without a local shell cannot run it |
 | [OpenMontage](https://github.com/calesthio/OpenMontage) | Workspace and Python 3.12 virtual environment |
 | Python packages | `faster-whisper`, `numpy` (see `requirements.txt`) |
 | Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes` (tested with 0.8.x) |
@@ -69,21 +72,37 @@ No API keys are needed. Everything runs locally.
 
 ### Install
 
+**1. Shared dependencies (once)**
+
 ```bash
 OM=~/Projects/OpenMontage                      # wherever OpenMontage lives
-git clone https://github.com/EmirhanYAZICI/reelsmith ~/.claude/skills/reelsmith
-
-# companion skills, so they load from any folder
-cp -r ~/.claude/skills/reelsmith/extras/whisper-tr ~/.claude/skills/
-cp -r $OM/.agents/skills/hyperframes $OM/.agents/skills/hyperframes-core $OM/.agents/skills/hyperframes-cli ~/.claude/skills/
-
-# Python packages into the OpenMontage venv, HyperFrames globally
-$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reelsmith/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
+$OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
 npm i -g hyperframes
+npx hyperframes skills                         # official HyperFrames skills for your agents
 ```
 
 If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` environment variable to its path.
-To check the install, type `/` in Claude Code. You should see `reelsmith`, `whisper-tr` and `hyperframes-core` in the list.
+
+**2. The skills: pick your tool**
+
+| Tool | Install |
+|---|---|
+| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith`, then `/plugin install reelsmith@reelsmith` |
+| Any supported agent | `npx skills add EmirhanYAZICI/reelsmith` (the open [skills](https://skills.sh) CLI; it asks which agents to install for) |
+| Manual | Copy `skills/reelsmith` and `skills/whisper-tr` into your tool's skills folder (table below) |
+
+| Tool | Skills folder (user-wide / per project) |
+|---|---|
+| Claude Code | `~/.claude/skills/` / `.claude/skills/` |
+| OpenAI Codex | `~/.codex/skills/` / `.codex/skills/` |
+| OpenCode | `~/.config/opencode/skills/` / `.opencode/skills/` |
+| Cursor | `~/.cursor/skills/` / `.cursor/skills/` |
+| Google Antigravity | `~/.gemini/antigravity/skills/` / `.agent/skills/` |
+
+Folder names can change between tool versions. If a path does not work, check your tool's docs or use `npx skills add`.
+Tools that do not load skills still read [`AGENTS.md`](AGENTS.md), which points them to the right `SKILL.md`.
+
+To check the install in Claude Code, type `/`. You should see `reelsmith` and `whisper-tr`.
 
 ### Usage
 
@@ -98,27 +117,25 @@ To check the install, type `/` in Claude Code. You should see `reelsmith`, `whis
    | Optional | `REELS-REHBERI.md` with project-specific rules. It overrides the bundled guide |
 
    You can use any number of scenes. The number of clips must match the number of script entries.
-2. Open Claude Code. OpenMontage is the best place, but any folder works. Then run:
+2. Ask your agent:
    ```
    /reelsmith <folder name or path> <output_name>.mp4 [caption wishes]
    ```
 3. Clip preparation and rendering take about 15-25 minutes. The finished video is copied into your folder and into a `cikti/` folder next to it.
 
-To run it by hand without Claude, see step 3 in [`SKILL.md`](SKILL.md).
+To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md).
 
 ### Repository layout
 
 | Path | Purpose |
 |---|---|
-| `SKILL.md` | The steps Claude follows |
-| `REELS-REHBERI.md` | Every setting: captions, logo, camera, audio, format, troubleshooting (Turkish) |
-| `ALTYAZI-STILLERI.md` | Caption colors, styles, animations and presets (Turkish) |
-| `extras/whisper-tr/SKILL.md` | Companion skill for local Turkish Whisper transcription |
-| `template/scripts/transcribe.py` | Whisper: audio to word timestamps |
-| `template/scripts/align.py` | Transcript + script to `timeline.json` (scenes, caption blocks) |
-| `template/scripts/build.py` | Synthesized SFX and the speech-ducking expression |
-| `template/scripts/build_video.py` | Clip prep, mix, composition, render, delivery |
-| `template/composition_video/index.html` | HyperFrames template (GSAP) |
+| `skills/reelsmith/SKILL.md` | The steps the agent follows |
+| `skills/reelsmith/REELS-REHBERI.md` | Every setting: captions, logo, camera, audio, format, troubleshooting (Turkish) |
+| `skills/reelsmith/CAPTION-STYLES.md` | Caption colors, styles, animations and presets (English / Turkish) |
+| `skills/reelsmith/template/` | Python scripts and the HyperFrames template copied into each project |
+| `skills/whisper-tr/` | Companion skill: local Whisper transcription with word timestamps |
+| `.claude-plugin/` | Claude Code plugin and marketplace manifests |
+| `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
 
 ### Origin
 
@@ -130,7 +147,7 @@ The skill was built and tested on a real project, a 7-scene, 2:22 Reel about the
 
 ### Ne yapar
 
-Bir klasöre seslendirme, numaralı sahne videoları, sahne metni ve logonu koyarsın. Sonra tek komut yazarsın:
+Bir klasöre seslendirme, numaralı sahne videoları, sahne metni ve logonu koyarsın. Sonra ajanına şunu yazarsın:
 
 ```
 /reelsmith klasorum videom.mp4
@@ -163,21 +180,21 @@ Her firma için çalışır. Klasöre koyduğun logo, markadır.
 
 Altyazı hep aynı yerdedir: Calibri Bold 75 px, alttan 450 px, ortalı. Sadece üç şey değişir:
 
-| Seçenek | Değerler |
-|---|---|
-| `--renk` | `sari` (varsayılan), `beyaz`, `yesil`, `altin`, `turuncu`, `kirmizi`, `pembe`, `mavi`, `mor`, `siyah` ya da herhangi bir `#RRGGBB` |
-| `--kontur` | aynı liste, varsayılan siyah |
-| `--stil` (yazı şekli) | `outline` (varsayılan), `box` (kutulu), `shadow` (gölgeli), `double` (çift kontur) |
-| `--anim` (giriş animasyonu) | `pop` (varsayılan), `hop`, `word-hop` (her kelime söylendiği anda zıplar), `bounce`, `wave` |
+| Seçenek | Varsayılan | Değerler |
+|---|---|---|
+| `--caption-color` | `yellow` | `yellow`, `white`, `green`, `gold`, `orange`, `red`, `pink`, `blue`, `purple`, `black` ya da herhangi bir `#RRGGBB`. Türkçe adlar da olur (`sari`, `beyaz`...) |
+| `--caption-outline` | `#000000` | aynı liste (kontur / gölge rengi) |
+| `--caption-style` | `outline` | `outline` (kontur), `box` (kutulu), `shadow` (gölgeli), `double` (çift kontur) |
+| `--caption-anim` | `pop` | `pop`, `hop`, `word-hop` (her kelime söylendiği anda zıplar), `bounce`, `wave` |
 
-Claude üzerinden çalıştırırken cümleyle söyleyebilirsin, örneğin: `/reelsmith klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
-Tüm liste ve hazır kombinasyonlar: [`ALTYAZI-STILLERI.md`](ALTYAZI-STILLERI.md).
+Ajana cümleyle de söyleyebilirsin, örneğin: `/reelsmith klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
+Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md).
 
 ### Gereksinimler
 
 | Araç | Not |
 |---|---|
-| [Claude Code](https://claude.com/claude-code) | Skill'i çalıştırır |
+| Yerel terminali olan bir ajan | Claude Code, Cursor, Codex CLI, OpenCode, Antigravity... Yerel terminali olmayan web sohbet uygulamaları bunu çalıştıramaz |
 | [OpenMontage](https://github.com/calesthio/OpenMontage) | Çalışma alanı ve Python 3.12 sanal ortamı |
 | Python paketleri | `faster-whisper`, `numpy` (bkz. `requirements.txt`) |
 | Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes` (0.8.x ile test edildi) |
@@ -188,21 +205,27 @@ API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 ### Kurulum
 
+**1. Ortak bağımlılıklar (bir kere)**
+
 ```bash
 OM=~/Projects/OpenMontage                      # OpenMontage nerede ise
-git clone https://github.com/EmirhanYAZICI/reelsmith ~/.claude/skills/reelsmith
-
-# yardımcı skill'ler, her klasörden yüklensin diye
-cp -r ~/.claude/skills/reelsmith/extras/whisper-tr ~/.claude/skills/
-cp -r $OM/.agents/skills/hyperframes $OM/.agents/skills/hyperframes-core $OM/.agents/skills/hyperframes-cli ~/.claude/skills/
-
-# Python paketleri OpenMontage venv'ine, HyperFrames global
-$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reelsmith/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
+$OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
 npm i -g hyperframes
+npx hyperframes skills                         # resmi HyperFrames skill'leri
 ```
 
 OpenMontage `~/Projects/OpenMontage` dışında bir yerdeyse `OPENMONTAGE_DIR` ortam değişkenine yolunu yaz.
-Kontrol için Claude Code'da `/` yaz. Listede `reelsmith`, `whisper-tr` ve `hyperframes-core` görünmeli.
+
+**2. Skill'ler: aracını seç**
+
+| Araç | Kurulum |
+|---|---|
+| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith`, sonra `/plugin install reelsmith@reelsmith` |
+| Desteklenen her ajan | `npx skills add EmirhanYAZICI/reelsmith` (açık [skills](https://skills.sh) aracı; hangi ajanlara kurulacağını sorar) |
+| Elle | `skills/reelsmith` ve `skills/whisper-tr` klasörlerini aracının skill klasörüne kopyala (yukarıdaki İngilizce bölümdeki tablo) |
+
+Araç skill yüklemiyorsa bile [`AGENTS.md`](AGENTS.md) dosyasını okur. O dosya ajanı doğru `SKILL.md`'ye yönlendirir.
+Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görünmeli.
 
 ### Kullanım
 
@@ -217,27 +240,13 @@ Kontrol için Claude Code'da `/` yaz. Listede `reelsmith`, `whisper-tr` ve `hype
    | İsteğe bağlı | `REELS-REHBERI.md`: projeye özel kurallar. Skill'deki rehberin yerine geçer |
 
    Sahne sayısı serbesttir. Video sayısı ile metindeki sahne sayısı eşit olmalı.
-2. Claude Code'u aç. En iyisi OpenMontage klasörü ama her klasörden çalışır. Sonra şunu yaz:
+2. Ajanına şunu yaz:
    ```
    /reelsmith <klasör adı ya da yolu> <video_adı>.mp4 [altyazı isteği]
    ```
 3. Klip hazırlığı ve render yaklaşık 15-25 dakika sürer. Bitmiş video senin klasörüne ve yanındaki `cikti/` klasörüne kopyalanır.
 
-Claude olmadan elle çalıştırmak için [`SKILL.md`](SKILL.md) içindeki 3. adıma bak.
-
-### Repo düzeni
-
-| Yol | Görev |
-|---|---|
-| `SKILL.md` | Claude'un izlediği adımlar |
-| `REELS-REHBERI.md` | Tüm ayarlar: altyazı, logo, kamera, ses, format, sık sorunlar |
-| `ALTYAZI-STILLERI.md` | Altyazı renkleri, stilleri, animasyonları ve hazır kombinasyonlar |
-| `extras/whisper-tr/SKILL.md` | Yerel Türkçe Whisper için yardımcı skill |
-| `template/scripts/transcribe.py` | Whisper: sesten kelime zamanlarına |
-| `template/scripts/align.py` | Döküm + metin → `timeline.json` (sahneler, altyazı blokları) |
-| `template/scripts/build.py` | Sentez SFX ve konuşmada kısma (ducking) ifadesi |
-| `template/scripts/build_video.py` | Klip hazırlama, miks, kompozisyon, render, teslim |
-| `template/composition_video/index.html` | HyperFrames şablonu (GSAP) |
+Ajan olmadan elle çalıştırmak için [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md) içindeki 3. adıma bak.
 
 ### Nereden çıktı
 

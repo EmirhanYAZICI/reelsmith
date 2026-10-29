@@ -15,12 +15,12 @@ argument-hint: "<ses ya da video dosyası> [özel isimler]"
 - Ortam değişkenleri: `PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1`. Bu ikincisi model indirmesinin takılmasını önler.
 
 ## Çalıştır
-Script `reelsmith` skill'i ile birlikte gelir: `~/.claude/skills/reelsmith/template/scripts/transcribe.py`.
+Script bu skill'in içinde: `scripts/transcribe.py` (aşağıda `SKILL_DIR` = bu SKILL.md dosyasının klasörü).
 
 ```bash
 OM="${OPENMONTAGE_DIR:-$HOME/Projects/OpenMontage}"; PY="$OM/.venv/Scripts/python.exe"
 export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
-"$PY" ~/.claude/skills/reelsmith/template/scripts/transcribe.py "<ses.mp3>" "<cikti.json>" "Özel isim 1, Özel isim 2"
+"$PY" "SKILL_DIR/scripts/transcribe.py" "<ses.mp3>" "<cikti.json>" "Özel isim 1, Özel isim 2"
 ```
 
 - Üçüncü argüman isteğe bağlı. Konudaki özel isimleri (marka, taş adı, kişi) yazarsan Whisper onları doğru duyar.
@@ -35,5 +35,5 @@ export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
 
 ## Notlar
 - OpenMontage'ın kendi `transcriber` aracı bu sistemde PyAV hatası veriyor (`metadata_errors`). Bu script sesi ffmpeg ile çözdüğü için o hatayı aşar.
-- Yazım hatası olabilir. Doğru yazım için metni senaryoyla hizala: `reelsmith/template/scripts/align.py`.
+- Yazım hatası olabilir. Doğru yazım için metni senaryoyla hizala: reelsmith skill'indeki `template/scripts/align.py`.
 - Daha doğru sonuç gerekirse script içinde `"small"` yerine `"medium"` ya da `"large-v3"` yaz. Daha yavaştır.

@@ -2,7 +2,8 @@
 
 Kullanım:
   python build_video.py --src=<kaynak klasör> [--name=video.mp4] [--vo=ses.mp3] [--logo=logo.png]
-                        [--font=calibrib.ttf] [--renk=sari] [--kontur=#000000] [--stil=outline] [--anim=pop]
+                        [--font=calibrib.ttf] [--caption-color=yellow] [--caption-outline=#000000]
+                        [--caption-style=outline] [--caption-anim=pop]
                         [--skip-prep] [--no-render] [<sahne klasörü>]
 
 1. sahne videolarını numarasına göre bulur (1sahne, sahne 1, sahne1_a, ikinci sahne ...)
@@ -48,9 +49,13 @@ LOGO = Path(_opt("logo")) if _opt("logo") else next(
 LOGO_W = 340  # ekrandaki logo genişliği (px)
 # Altyazı fontu Calibri Bold: lisans gereği repoda yok, Windows'tan (ya da --font=) kopyalanır
 FONT = Path(_opt("font", r"C:\Windows\Fonts\calibrib.ttf"))
-# Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. ALTYAZI-STILLERI.md)
-COLORS = {"sari": "#F8D85A", "beyaz": "#FFFFFF", "yesil": "#B8E04A", "altin": "#E8C15A", "turuncu": "#FFA53D",
-          "kirmizi": "#FF5A5A", "pembe": "#FF7AC6", "mavi": "#5AC8FA", "mor": "#B79CFF", "siyah": "#111111"}
+# Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. CAPTION-STYLES.md)
+# Seçenekler: --caption-color, --caption-outline, --caption-style, --caption-anim
+# (eski Türkçe adlar da çalışır: --renk, --kontur, --stil, --anim)
+COLORS = {"yellow": "#F8D85A", "white": "#FFFFFF", "green": "#B8E04A", "gold": "#E8C15A", "orange": "#FFA53D",
+          "red": "#FF5A5A", "pink": "#FF7AC6", "blue": "#5AC8FA", "purple": "#B79CFF", "black": "#111111"}
+COLOR_ALIASES = {"sari": "yellow", "beyaz": "white", "yesil": "green", "altin": "gold", "turuncu": "orange",
+                 "kirmizi": "red", "pembe": "pink", "mavi": "blue", "mor": "purple", "siyah": "black"}
 STYLES = ("outline", "box", "shadow", "double")
 ANIMS = ("pop", "hop", "word-hop", "bounce", "wave")
 
@@ -59,19 +64,24 @@ def _color(v: str) -> str:
     v = v.lower()
     for a, b in zip("ışğüöç", "isguoc"):
         v = v.replace(a, b)
+    v = COLOR_ALIASES.get(v, v)
     if v in COLORS:
         return COLORS[v]
     if re.fullmatch(r"#?[0-9a-f]{6}", v):
         return "#" + v.lstrip("#").upper()
-    raise SystemExit(f"Bilinmeyen renk: {v}. Seçenekler: {', '.join(COLORS)} ya da #RRGGBB")
+    raise SystemExit(f"Unknown color / bilinmeyen renk: {v}. Options: {', '.join(COLORS)} or #RRGGBB")
 
 
-CAPTION = {"fill": _color(_opt("renk", "sari")), "stroke": _color(_opt("kontur", "#000000")),
-           "style": _opt("stil", "outline"), "anim": _opt("anim", "pop")}
+def _cap(name: str, old: str, default: str) -> str:
+    return _opt(f"caption-{name}") or _opt(old) or default
+
+
+CAPTION = {"fill": _color(_cap("color", "renk", "yellow")), "stroke": _color(_cap("outline", "kontur", "#000000")),
+           "style": _cap("style", "stil", "outline"), "anim": _cap("anim", "anim", "pop")}
 if CAPTION["style"] not in STYLES:
-    raise SystemExit(f"Bilinmeyen stil: {CAPTION['style']}. Seçenekler: {', '.join(STYLES)}")
+    raise SystemExit(f"Unknown style / bilinmeyen stil: {CAPTION['style']}. Options: {', '.join(STYLES)}")
 if CAPTION["anim"] not in ANIMS:
-    raise SystemExit(f"Bilinmeyen animasyon: {CAPTION['anim']}. Seçenekler: {', '.join(ANIMS)}")
+    raise SystemExit(f"Unknown animation / bilinmeyen animasyon: {CAPTION['anim']}. Options: {', '.join(ANIMS)}")
 TR = 0.8  # geçiş süresi
 TL = build.TL
 FPS = 30

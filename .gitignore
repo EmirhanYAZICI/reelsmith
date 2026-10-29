@@ -3,12 +3,12 @@ __pycache__/
 *.pyc
 
 # Üretilen dosyalar (projeye kopyalanınca oluşur)
-template/artifacts/
-template/assets/
-template/renders/
-template/composition_video/data.js
-template/composition_video/assets/
-template/composition_video/.hyperframes/
+skills/reelsmith/template/artifacts/
+skills/reelsmith/template/assets/
+skills/reelsmith/template/renders/
+skills/reelsmith/template/composition_video/data.js
+skills/reelsmith/template/composition_video/assets/
+skills/reelsmith/template/composition_video/.hyperframes/
 
 # Medya ve fontlar (lisans / boyut)
 *.mp4

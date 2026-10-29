@@ -69,7 +69,7 @@ Skill'deki şablonu yeni proje olarak kopyala:
 
 ```bash
 cd <OpenMontage>/projects
-cp -r ~/.claude/skills/reelsmith/template <yeni-proje-id>
+cp -r <reelsmith skill klasörü>/template <yeni-proje-id>
 mkdir -p <yeni-proje-id>/artifacts <yeni-proje-id>/assets/audio && cd <yeni-proje-id>
 PY=../../.venv/Scripts/python.exe          # Linux/macOS: ../../.venv/bin/python
 export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
@@ -133,10 +133,10 @@ Son video iki yere kopyalanır (script otomatik yapar):
   - Font **Calibri Bold** (`assets/calibrib.ttf`), boyut **75px**, alttan **450px** (720p'de 50 / 300'e karşılık gelir).
   - Dikey videoda ortalı.
   - 2-3 kelime, tek satır. Cümle sonunda her zaman böl. Karaoke ya da renkli vurgu yok.
-- **Seçilebilir** (ayrıntı: `ALTYAZI-STILLERI.md`):
-  - Renk `--renk=` (sari, beyaz, yesil, altin, turuncu, kirmizi, pembe, mavi, mor, siyah ya da `#RRGGBB`). Kontur rengi `--kontur=`.
-  - Yazı şekli `--stil=`: `outline`, `box`, `shadow`, `double`.
-  - Hoplayan giriş `--anim=`: `pop`, `hop`, `word-hop`, `bounce`, `wave`.
+- **Seçilebilir** (ayrıntı: `CAPTION-STYLES.md`):
+  - Renk `--caption-color=` (yellow, white, green, gold, orange, red, pink, blue, purple, black ya da `#RRGGBB`; Türkçe adlar da olur). Kontur rengi `--caption-outline=`.
+  - Yazı şekli `--caption-style=`: `outline`, `box`, `shadow`, `double`.
+  - Hoplayan giriş `--caption-anim=`: `pop`, `hop`, `word-hop`, `bounce`, `wave`.
 - **Varsayılan** (örnek proje Zebercet'te kullanılan): sarı `#F8D85A` + 10px siyah kontur + gölge (`outline`) + `pop` (opacity 0→1, scale 0.88→1, `back.out`). Sonraki blok gelince kaybolur.
 - Yazım her zaman sahne metnindeki gibi olur (Whisper'ın yazımı değil).
 
