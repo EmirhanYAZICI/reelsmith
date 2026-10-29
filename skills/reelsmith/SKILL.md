@@ -70,9 +70,8 @@ $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL
 - Klip hazırlığı + render 15-25 dk sürer. Arka planda çalıştır, bitince bildirim gelir. Bekleme döngüsü kurma.
 
 ## 4. Kontrol et ve teslim et
-- ffprobe: 1080x1920, 30 fps.
-- ebur128: ≈ -14 LUFS, tepe < -1 dBFS.
-- freezedetect: 0 donma.
+- `build_video.py` render sonunda `scripts/verify.py`'yi kendisi çalıştırır: 1080x1920, 30 fps, H.264 + AAC, ≈ -14 LUFS, tepe < -0.5 dBFS, 0 donma, faststart, süre.
+- Elle: `$PY scripts/verify.py renders/<isim>.mp4 --duration=<timeline süresi>`. FAIL varsa kullanıcıya hangi kontrolün kaldığını düz cümleyle söyle.
 - Video kaynak klasöre ve `<üst klasör>/cikti/` klasörüne kopyalanır. İki yolu da kullanıcıya ver.
 
 ## Şablonu güncel tut

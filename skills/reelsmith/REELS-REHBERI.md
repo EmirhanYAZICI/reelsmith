@@ -107,12 +107,11 @@ $PY scripts/build_video.py --src="$SRC" --name=<konu>_reels_final.mp4 --skip-pre
 - Bir araç yoksa ya da ffmpeg hata verirse script hangi adımda ve hangi dosyada olduğunu yazıp durur (Python izi değil).
 - Uzun sürer (klip hazırlığı + render ~15-25 dk). Arka planda çalıştır.
 
-**4) Kontrol**
+**4) Kontrol** (render sonunda otomatik çalışır)
 ```bash
-ffprobe -v error -show_entries stream=width,height,r_frame_rate:format=duration <final>
-ffmpeg -i <final> -af ebur128=peak=true -f null -     # hedef ≈ -14 LUFS, tepe < -1 dBFS
-ffmpeg -i <final> -vf freezedetect=n=0.003:d=1 -an -f null -   # donma olmamalı
+$PY scripts/verify.py renders/<isim>.mp4 --duration=<timeline süresi>
 ```
+1080x1920, 30 fps, H.264 + AAC 48 kHz, ≈ -14 LUFS (±1.5), tepe < -0.5 dBFS, 0 donma, faststart ve süreyi kontrol eder. Her satır OK / FAIL.
 
 **5) Teslim**
 Son video iki yere kopyalanır (script otomatik yapar):
@@ -186,6 +185,7 @@ Varsayılan (`move`) davranış:
 | Dosya | Görev |
 |---|---|
 | `scripts/check.py` | Ön kontrol: araçlar, sahne metni, klipler, seslendirme, logo, font, seçenekler |
+| `scripts/verify.py` | Render sonrası çıktı kontrolü: boyut, fps, codec, ses yüksekliği, tepe, donma, faststart, süre |
 | `scripts/common.py` | Ortak yardımcılar: sahne adı tanıma, sahne metni okuma, altyazı/logo seçenekleri |
 | `scripts/transcribe.py` | Whisper → `artifacts/voiceover_transcript.json` |
 | `scripts/align.py` | Döküm + sahne metni → `artifacts/timeline.json` (sahneler, kelimeler, altyazı blokları) |

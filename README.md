@@ -62,6 +62,27 @@ Time: about 15-25 minutes for a 2-3 minute Reel on a mid-range laptop (tested on
 curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
 ```
 
+Prefer to read the script before it runs, or want a fixed version? Download the release, check its SHA-256, read `install.ps1` / `install.sh`, then run it from the folder (it uses the downloaded files and clones nothing):
+
+```powershell
+# Windows (PowerShell)
+irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/reelsmith-v1.3.1.zip -OutFile reelsmith-v1.3.1.zip
+irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/SHA256SUMS.txt -OutFile SHA256SUMS.txt
+(Get-FileHash reelsmith-v1.3.1.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
+Expand-Archive reelsmith-v1.3.1.zip .; notepad reelsmith\install.ps1
+powershell -ExecutionPolicy Bypass -File reelsmith\install.ps1
+```
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/reelsmith-v1.3.1.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/SHA256SUMS.txt
+sha256sum -c SHA256SUMS.txt --ignore-missing      # macOS: shasum -a 256 -c SHA256SUMS.txt --ignore-missing
+unzip -q reelsmith-v1.3.1.zip && less reelsmith/install.sh
+./reelsmith/install.sh
+```
+
+The installer never deletes your edits: if an installed `reelsmith` or `whisper-tr` folder differs from the new one, it is moved to `~/.reelsmith-backups/<time>/` first. It requires Python 3.10-3.12 and stops with a clear message otherwise.
+
 **2. Or install for one agent only.**
 
 | Agent | Install | Then |
@@ -128,6 +149,10 @@ The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to
 # macOS / Linux / Git Bash
 curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
 ```
+
+Script'i çalışmadan önce okumak ya da sabit bir sürüm kurmak istersen: Release'i indir, SHA-256 değerini kontrol et, `install.ps1` / `install.sh` dosyasını oku, sonra klasörden çalıştır (indirilen dosyaları kullanır, başka bir şey indirmez). Komutlar yukarıdaki İngilizce bölümde aynı.
+
+Kurulum aracı senin değişikliklerini silmez: kurulu `reelsmith` ya da `whisper-tr` klasörü yenisinden farklıysa önce `~/.reelsmith-backups/<zaman>/` içine taşınır. Python 3.10-3.12 ister, başka sürümde açık bir mesajla durur.
 
 **2. Ya da sadece tek bir ajana kur.**
 
@@ -267,9 +292,10 @@ From a clone: `.\install.ps1` or `./install.sh`. Options:
 | `-Project` | `--project` | Install into the current project folder instead of your home |
 | `-OM <path>` | `--om=<path>` | OpenMontage location |
 | `-SkillsOnly` | `--skills-only` | Copy the skills only, skip dependencies |
+| `-NoBackup` | `--no-backup` | Replace changed skill folders without keeping a backup |
 | `-DryRun` | `--dry-run` | Show what would happen, change nothing |
 
-The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It only replaces the `reelsmith` and `whisper-tr` folders in each skills folder.
+The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.10-3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It checks the real version of the Python it would use (and of an existing `.venv`), not just the command name. It only touches the `reelsmith` and `whisper-tr` folders in each skills folder: identical copies are left alone, changed ones are backed up first.
 
 The manual steps below do the same thing by hand.
 
@@ -345,7 +371,9 @@ pip install -r requirements-dev.txt
 python -m pytest tests
 ```
 
-The tests cover scene file names, script parsing, caption and logo options, Whisper-to-script alignment (misheard and missing words), the preflight check with real generated media, and a full build without the final render: clip slow-motion, 1080x1920 crop, composition data and the audio mix. If HyperFrames is installed, the generated composition is also linted. CI runs them on Windows and Ubuntu and installs the skills with both installers on Windows, macOS and Ubuntu.
+The tests cover scene file names, script parsing, caption and logo options, Whisper-to-script alignment (misheard and missing words), the preflight check with real generated media, a full build without the final render (clip slow-motion, 1080x1920 crop, composition data, audio mix) and the output check (`verify.py`: size, frame rate, codecs, loudness, peak, frozen picture, faststart). If HyperFrames is installed, the generated composition is also linted. CI runs them on Windows and Ubuntu and installs the skills with both installers on Windows, macOS and Ubuntu.
+
+What was tested where, installer scenarios, the end-to-end render and what is not covered yet: [`TESTING.md`](TESTING.md).
 
 Found a bug? Open an [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) and paste the preflight output.
 
@@ -362,7 +390,8 @@ Found a bug? Open an [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/n
 | `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
 | `install.ps1`, `install.sh` | One-command installer (Windows / macOS, Linux, Git Bash) |
 | `skills/reelsmith/template/scripts/check.py` | Preflight check: tools, clips, voiceover, logo, script |
-| `tests/` | pytest suite (runs in GitHub Actions on Windows and Ubuntu) |
+| `skills/reelsmith/template/scripts/verify.py` | Output check after render: size, fps, codecs, loudness, peak, freezes, faststart |
+| `tests/`, `TESTING.md` | pytest suite and the test report |
 | `assets/` | Banner, social preview image and demo images |
 
 ### Origin
@@ -450,7 +479,7 @@ API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 Repo indirildiyse: `.\install.ps1` ya da `./install.sh`. Seçenekler yukarıdaki İngilizce tabloda (`-Agents`, `-Project`, `-OM`, `-SkillsOnly`, `-DryRun`).
 
-Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Skill klasörlerinde sadece `reelsmith` ve `whisper-tr` klasörlerini değiştirir.
+Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.10-3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Kullanacağı Python'un (ve varsa mevcut `.venv`'in) gerçek sürümünü kontrol eder. Skill klasörlerinde sadece `reelsmith` ve `whisper-tr` klasörlerine dokunur: aynıysa bırakır, farklıysa önce yedekler (`-NoBackup` / `--no-backup` ile yedeksiz).
 
 Aşağıdaki elle kurulum adımları aynı işi tek tek yapar.
 
@@ -516,7 +545,9 @@ pip install -r requirements-dev.txt
 python -m pytest tests
 ```
 
-Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı ve logo seçenekleri, Whisper ile metin eşleştirme (yanlış duyulan ve hiç duyulmayan kelimeler), gerçek üretilmiş medya ile ön kontrol ve son render hariç tam kurgu: klip yavaşlatma, 1080x1920 kırpma, kompozisyon verisi ve ses miksajı. HyperFrames kuruluysa üretilen kompozisyon lint'ten de geçer. CI bunları Windows ve Ubuntu'da çalıştırır, iki kurulum aracıyla skill'leri Windows, macOS ve Ubuntu'ya kurar.
+Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı ve logo seçenekleri, Whisper ile metin eşleştirme (yanlış duyulan ve hiç duyulmayan kelimeler), gerçek üretilmiş medya ile ön kontrol, son render hariç tam kurgu (klip yavaşlatma, 1080x1920 kırpma, kompozisyon verisi, ses miksajı) ve çıktı kontrolü (`verify.py`: boyut, fps, codec, ses yüksekliği, tepe, donma, faststart). HyperFrames kuruluysa üretilen kompozisyon lint'ten de geçer. CI bunları Windows ve Ubuntu'da çalıştırır, iki kurulum aracıyla skill'leri Windows, macOS ve Ubuntu'ya kurar.
+
+Nerede neyin test edildiği, kurulum senaryoları, uçtan uca render ve henüz kapsanmayanlar: [`TESTING.md`](TESTING.md).
 
 Hata mı buldun? Bir [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) aç ve ön kontrol çıktısını yapıştır.
 

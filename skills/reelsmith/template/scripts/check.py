@@ -70,7 +70,7 @@ def check_tools() -> None:
     if (3, 10) <= v[:2] <= (3, 12):
         ok(f"Python {v.major}.{v.minor}")
     else:
-        warn(f"Python {v.major}.{v.minor}: faster-whisper is tested on 3.10-3.12 / 3.10-3.12 önerilir")
+        fail(f"Python {v.major}.{v.minor}: faster-whisper needs 3.10-3.12 / 3.10-3.12 gerekli (winget install Python.Python.3.12)")
     for mod in ("numpy", "faster_whisper"):
         if importlib.util.find_spec(mod):
             ok(f"python package {mod}")

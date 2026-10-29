@@ -11,13 +11,19 @@
 #   -OM <path>     OpenMontage folder (default: $env:OPENMONTAGE_DIR or ~\Projects\OpenMontage)
 #   -SkillsOnly    copy the skills, skip dependencies
 #   -NoHfSkills    skip "npx hyperframes skills"
+#   -NoBackup      replace changed skill folders without keeping a backup copy
 #   -DryRun        show what would happen, change nothing
+#
+# Existing reelsmith / whisper-tr folders are left alone when identical. When they differ,
+# the old copy is moved to ~\.reelsmith-backups\<time>\<agent>\ before the new one is copied.
+# Python must be 3.10-3.12 (faster-whisper); other versions stop the install with a message.
 param(
     [string[]]$Agents = @('auto'),
     [switch]$Project,
     [string]$OM = $(if ($env:OPENMONTAGE_DIR) { $env:OPENMONTAGE_DIR } else { Join-Path $HOME 'Projects\OpenMontage' }),
     [switch]$SkillsOnly,
     [switch]$NoHfSkills,
+    [switch]$NoBackup,
     [switch]$DryRun
 )
 $ErrorActionPreference = 'Stop'
@@ -31,6 +37,16 @@ function Say($m) { Write-Host "`n== $m" }
 function Ok($m) { Write-Host "   ok    $m" }
 function Warn($m) { Write-Host "   WARN  $m" -ForegroundColor Yellow }
 function Has($c) { [bool](Get-Command $c -ErrorAction SilentlyContinue) }
+# faster-whisper needs Python 3.10 - 3.12
+function PyVer([string[]]$cmd) {
+    try {
+        $exe, $rest = $cmd
+        $v = & $exe @rest -c "import sys; print('%d.%d' % sys.version_info[:2])" 2>$null
+        if ($LASTEXITCODE -eq 0 -and $v) { return "$v".Trim() }
+    } catch {}
+    return $null
+}
+function PyOk($v) { $v -and ([version]$v -ge [version]'3.10') -and ([version]$v -le [version]'3.12') }
 function Run([scriptblock]$b) {
     if ($DryRun) { Write-Host "   would run: $b" } else { & $b; if ($LASTEXITCODE) { throw "failed: $b" } }
 }
@@ -41,7 +57,7 @@ if (-not $Src -or -not (Test-Path (Join-Path $Src 'skills\reelsmith\SKILL.md')))
     $Src = if ($env:REELSMITH_HOME) { $env:REELSMITH_HOME } else { Join-Path $HOME '.reelsmith' }
     Say "Getting Reelsmith into $Src"
     if (Test-Path (Join-Path $Src '.git')) { Run { git -C $Src pull --ff-only } }
-    else { Run { git clone --depth 1 $RepoUrl $Src } }
+    else { $ref = if ($env:REELSMITH_REF) { $env:REELSMITH_REF } else { 'main' }; Run { git clone --depth 1 --branch $ref $RepoUrl $Src } }
 }
 
 function AgentDir($a) {
@@ -88,13 +104,26 @@ if (-not $SkillsOnly) {
 
     $Vpy = Join-Path $OM '.venv\Scripts\python.exe'
     if (-not (Test-Path $Vpy)) {
-        # faster-whisper needs Python 3.10 - 3.12
-        Say "Creating $OM\.venv"
-        $has312 = $false
-        if (Has py) { try { $has312 = [bool](& py -3.12 --version 2>$null) } catch {} }
-        if ($has312) { Run { py -3.12 -m venv (Join-Path $OM '.venv') } }
-        elseif (Has python) { Warn 'py -3.12 not found, using "python". faster-whisper needs Python 3.10 - 3.12.'; Run { python -m venv (Join-Path $OM '.venv') } }
-        else { Warn 'Python 3.12 not found. Install it: winget install Python.Python.3.12'; exit 1 }
+        $base = $null; $found = @()
+        foreach ($c in @(@('py', '-3.12'), @('py', '-3.11'), @('py', '-3.10'), @('python'), @('python3'))) {
+            if (-not (Has $c[0])) { continue }
+            $v = PyVer $c
+            if (PyOk $v) { $base = $c; break }
+            if ($v) { $found += "$($c -join ' ')=$v" }
+        }
+        if (-not $base) {
+            Warn "Python 3.10-3.12 is required (faster-whisper). Found: $(if ($found) { $found -join ', ' } else { 'none' })"
+            Write-Host '     winget install Python.Python.3.12'
+            exit 1
+        }
+        Say "Creating $OM\.venv with $($base -join ' ') (Python $(PyVer $base))"
+        $exe, $rest = $base
+        Run { & $exe @rest -m venv (Join-Path $OM '.venv') }
+    }
+    if ((Test-Path $Vpy) -and -not (PyOk (PyVer @($Vpy)))) {
+        Warn "$OM\.venv uses Python $(PyVer @($Vpy)); faster-whisper needs 3.10-3.12."
+        Write-Host '     Recreate it with Python 3.12, or pass -OM <another folder>.'
+        exit 1
     }
     Say "Python packages ($Vpy)"
     Run { & $Vpy -m pip install -q -r (Join-Path $Src 'requirements.txt') }
@@ -112,17 +141,35 @@ if (-not $SkillsOnly) {
 }
 
 # 2. Skills
+$BackupRoot = Join-Path $HOME ".reelsmith-backups\$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+function TreeHash($dir) {  # relative path + content hash of every file, __pycache__ ignored
+    $root = (Resolve-Path $dir).Path
+    Get-ChildItem -Recurse -File $root | Where-Object { $_.FullName -notmatch '[\\/]__pycache__[\\/]|\.pyc$' } |
+        Sort-Object FullName | ForEach-Object { $_.FullName.Substring($root.Length) + ':' + (Get-FileHash $_.FullName -Algorithm SHA256).Hash }
+}
+function InstallSkill($agent, $dir, $s) {
+    $from = Join-Path $Src "skills\$s"
+    $dst = Join-Path $dir $s
+    if (Test-Path $dst) {
+        if (-not (Compare-Object @(TreeHash $from) @(TreeHash $dst))) { Ok "$agent/$s is already up to date"; return }
+        $bak = Join-Path $BackupRoot "$agent\$s"
+        if ($DryRun) { Write-Host "   would $(if ($NoBackup) { 'delete' } else { "move to $bak" }): $dst" }
+        elseif ($NoBackup) { Remove-Item -Recurse -Force $dst }
+        else {
+            New-Item -ItemType Directory -Force (Split-Path $bak) | Out-Null
+            Move-Item $dst $bak
+            Ok "$agent/$s`: your previous copy was saved to $bak"
+        }
+    }
+    if ($DryRun) { Write-Host "   would copy: skills\$s -> $dst"; return }
+    Copy-Item -Recurse $from $dst
+}
 Say "Installing skills for: $($List -join ', ')"
 foreach ($a in $List) {
     $dir = AgentDir $a
     if (-not $dir) { Warn "unknown agent: $a"; continue }
-    foreach ($s in $Skills) {
-        $dst = Join-Path $dir $s
-        if ($DryRun) { Write-Host "   would copy: skills\$s -> $dst"; continue }
-        New-Item -ItemType Directory -Force $dir | Out-Null
-        if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
-        Copy-Item -Recurse (Join-Path $Src "skills\$s") $dst
-    }
+    if (-not $DryRun) { New-Item -ItemType Directory -Force $dir | Out-Null }
+    foreach ($s in $Skills) { InstallSkill $a $dir $s }
     Ok "$a  ->  $dir"
 }
 

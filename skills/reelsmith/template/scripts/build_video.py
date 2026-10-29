@@ -285,6 +285,9 @@ def main() -> None:
         dst.parent.mkdir(exist_ok=True)
         shutil.copy2(final, dst)
         print("kopyalandı:", dst)
+    print("\nçıktı kontrolü / output check:")  # FAIL olsa da video kopyalanmış olur; sonucu kullanıcıya söyle
+    subprocess.run([sys.executable, str(Path(__file__).parent / "verify.py"), str(final),
+                    f"--duration={TL['duration']:.3f}"])
 
 
 if __name__ == "__main__":
