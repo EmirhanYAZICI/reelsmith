@@ -75,7 +75,25 @@ curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/instal
 
 For one agent with the installer: `.\install.ps1 -Agents codex` or `./install.sh --agents=codex` (from a clone of this repo).
 
-**3. Make a Reel.** Put your files in a folder on the Desktop and call the skill:
+**3. Prepare your material.** Reelsmith edits your clips; it does not generate them. Make them first:
+
+1. **Write the script, scene by scene.** Split the narration into scenes (5-10 is typical). Each scene's text is exactly what the voiceover says during that scene.
+2. **Generate one clip per scene, in order,** with any video tool: Google Gemini (Veo), Kling, Runway, Sora, or your own footage. Vertical 9:16, about 8-10 seconds each. Write each prompt from that scene's text. The clips can keep their own music and sound effects; Reelsmith keeps them and lowers them under the voice.
+3. **Name the clips by scene number:** `scene1.mp4`, `scene2.mp4`, ... (or `1sahne.mp4`). The number decides which scene a clip belongs to. Two clips for one scene: `scene3.mp4` and `scene3_b.mp4`.
+4. **Record or generate the voiceover** reading the script, in the same order.
+5. **Add your logo** as a transparent `logo.png`.
+
+Example script (`script.txt`), one paragraph per scene:
+
+```
+This green stone comes from deep inside the Earth.
+
+Volcanoes carry its crystals up to the surface.
+
+Some of it even fell from space, inside meteorites.
+```
+
+**4. Make a Reel.** Put your files in a folder on the Desktop and call the skill:
 
 ```
 my-brand/
@@ -122,7 +140,25 @@ curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/instal
 | **Google Antigravity** | kurulum aracı `-Agents antigravity` / `--agents=antigravity` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
 | **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith` | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
 
-**3. Reels'i yap.** Dosyaları Masaüstünde bir klasöre koy ve skill'i çağır:
+**3. Malzemeyi hazırla.** Reelsmith kliplerini kurgular, klip üretmez. Önce onları hazırla:
+
+1. **Metni sahne sahne yaz.** Anlatımı sahnelere böl (genelde 5-10 sahne). Her sahnenin metni, o sahnede seslendirmede okunan yazının aynısı olsun.
+2. **Her sahne için sırayla bir video üret:** Google Gemini (Veo), Kling, Runway, Sora ya da kendi çekimin. Dikey 9:16, her biri 8-10 saniye. Her videonun komutunu (prompt) o sahnenin metnine göre yaz. Videoların kendi müziği ve efekti olabilir; Reelsmith onları korur ve konuşma sırasında kısar.
+3. **Videoları sahne numarasıyla adlandır:** `1sahne.mp4`, `2sahne.mp4`, ... (ya da `scene1.mp4`). Hangi videonun hangi sahneye gideceğini numara belirler. Bir sahneye iki video: `3sahne.mp4` ve `3sahne_b.mp4`.
+4. **Seslendirmeyi** aynı sırayla metni okuyarak kaydet ya da ürettir.
+5. **Logonu** şeffaf `logo.png` olarak ekle.
+
+Örnek sahne metni (`metin.txt`), her sahne bir paragraf:
+
+```
+Bu yeşil taş Dünya'nın derinliklerinden gelir.
+
+Volkanlar kristallerini yeryüzüne taşır.
+
+Bir kısmı ise göktaşlarının içinde uzaydan düşmüştür.
+```
+
+**4. Reels'i yap.** Dosyaları Masaüstünde bir klasöre koy ve skill'i çağır:
 
 ```
 markam/
