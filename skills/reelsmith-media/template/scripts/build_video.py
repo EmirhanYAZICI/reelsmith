@@ -2,7 +2,7 @@
 
 Kullanım:
   python build_video.py --src=<kaynak klasör> [--name=video.mp4] [--vo=ses.mp3] [--logo=logo.png]
-                        [--font=calibrib.ttf] [--caption-color=yellow] [--caption-outline=#000000]
+                        [--font=<bold .ttf>] [--caption-color=yellow] [--caption-outline=#000000]
                         [--caption-style=outline] [--caption-anim=pop]
                         [--skip-prep] [--no-render] [<sahne klasörü>]
 
@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 import build  # noqa: E402  (SFX + miks fonksiyonları)
-from common import (OptionError, caption_options, group_clips, logo_options,  # noqa: E402
+from common import (OptionError, caption_font, caption_options, group_clips, logo_options,  # noqa: E402
                     plan_segments)
 
 COMP = ROOT / "composition_video"
@@ -51,8 +51,8 @@ _pngs = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() == ".png")
 LOGO = Path(_opt("logo")) if _opt("logo") else next(
     (p for p in _pngs if re.search(r"logo", p.stem.lower())), _pngs[0] if len(_pngs) == 1 else None)
 LOGO_W = 340  # logo-wrap taban genişliği (px); ekrandaki boyutu --logo-size belirler
-# Altyazı fontu Calibri Bold: lisans gereği repoda yok, Windows'tan (ya da --font=) kopyalanır
-FONT = Path(_opt("font", r"C:\Windows\Fonts\calibrib.ttf"))
+# Altyazı fontu: --font, yoksa Windows'taki Calibri Bold, yoksa repodaki Carlito Bold (aynı ölçüler)
+FONT = caption_font(_opt("font", ""))
 # Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. CAPTION-STYLES.md)
 # Logo: --logo-mode=move|corner|ends, --logo-pos, --logo-size, --logo-moves (bkz. REELS-REHBERI.md)
 try:
@@ -213,7 +213,7 @@ def use_font() -> None:
     if dst.exists():
         return
     if not FONT.exists():
-        raise SystemExit(f"Font bulunamadı: {FONT}. Calibri Bold dosyasını --font=<yol> ile ver.")
+        raise SystemExit(f"Font bulunamadı: {FONT}. Kalın bir .ttf dosyasını --font=<yol> ile ver.")
     shutil.copy2(FONT, dst)
 
 

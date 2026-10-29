@@ -57,7 +57,7 @@ export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
 STIL="--caption-color=yellow --caption-style=outline --caption-anim=pop"   # CAPTION-STYLES.md
 LOGO="--logo-mode=move --logo-pos=bottom-left"                            # REELS-REHBERI.md > Logo
 $PY scripts/check.py --src="<klasör>" $STIL $LOGO                                          # FAIL varsa dur
-$PY scripts/transcribe.py "<seslendirme>" artifacts/voiceover_transcript.json "<metindeki özel isimler>"
+$PY scripts/transcribe.py "<seslendirme>" artifacts/voiceover_transcript.json "<metindeki özel isimler>" --language=tr   # İngilizce: en, bilinmiyor: auto
 $PY scripts/align.py "<sahne metni>"
 $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL $LOGO --no-render
 (cd composition_video && npx --no-install hyperframes snapshot --at 0.5,10,30,60,90 --no-end)   # kareleri gör
@@ -66,7 +66,8 @@ $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL
 - Altyazı (`--caption-*`) ve logo (`--logo-mode`, `--logo-pos`, `--logo-size`, `--logo-moves`) seçenekleri bütün komutlarda aynı verilmeli.
 - Kullanıcı logo için bir şey söylemediyse `$LOGO` varsayılan kalır (hareketli, sol alttan). "Sabit", "sağ üstte", "başta ve sonda büyük" gibi istekleri `REELS-REHBERI.md` > Logo tablosundan çevir.
 - Render yarıda kesilirse klipler hazırdır: aynı komutu `--skip-prep` ile tekrar çalıştır.
-- Altyazı fontu Calibri Bold. Lisans gereği repoda yok. Script Windows'taki `C:\Windows\Fonts\calibrib.ttf` dosyasını kopyalar. Başka sistemde `--font=<yol>` ver.
+- Seslendirme Türkçe değilse `transcribe.py`'ye dilini ver: `--language=en`, `--language=de`... Emin değilsen `--language=auto`.
+- Altyazı fontu: Windows'ta Calibri Bold (`C:\Windows\Fonts\calibrib.ttf`), yoksa repodaki Carlito Bold (`template/fonts/`, Calibri ile aynı ölçüler, OFL lisanslı). Başka bir font için `--font=<yol>` ver.
 - Klip hazırlığı + render 15-25 dk sürer. Arka planda çalıştır, bitince bildirim gelir. Bekleme döngüsü kurma.
 
 ## 4. Kontrol et ve teslim et

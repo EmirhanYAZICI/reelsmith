@@ -20,7 +20,7 @@ Script bu skill'in içinde: `scripts/transcribe.py` (aşağıda `SKILL_DIR` = bu
 ```bash
 OM="${OPENMONTAGE_DIR:-$HOME/Projects/OpenMontage}"; PY="$OM/.venv/Scripts/python.exe"
 export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
-"$PY" "SKILL_DIR/scripts/transcribe.py" "<ses.mp3>" "<cikti.json>" "Özel isim 1, Özel isim 2"
+"$PY" "SKILL_DIR/scripts/transcribe.py" "<ses.mp3>" "<cikti.json>" "Özel isim 1, Özel isim 2" --language=tr   # en, de, ... ya da auto
 ```
 
 - Üçüncü argüman isteğe bağlı. Konudaki özel isimleri (marka, taş adı, kişi) yazarsan Whisper onları doğru duyar.

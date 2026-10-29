@@ -104,3 +104,12 @@ def test_plan_segments_splits_scene_and_overlaps_transitions():
         (1, 0.0, 4.0, True), (2, 4.0, 7.0, True), (2, 7.0, 10.0, False)]
     assert segs[0]["vstart"] == 0.0 and segs[-1]["vend"] == 10.0
     assert segs[1]["vstart"] == 3.6 and segs[1]["vend"] == 7.4  # tr/2 bindirme
+
+
+def test_caption_font_falls_back_to_bundled_carlito():
+    import common
+    assert common.caption_font("my.ttf") == Path("my.ttf")
+    font = common.caption_font()
+    assert font.is_file()
+    assert font in (common.CALIBRI, common.CARLITO)
+    assert common.CARLITO.is_file()

@@ -2,6 +2,16 @@
 
 All notable changes to Reelsmith. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] - 2026-10-30
+
+### Added
+- `--language` for `transcribe.py` (both skills): any language Whisper supports, or `auto`. Turkish stays the default.
+- Bundled caption font: Carlito Bold (same metrics as Calibri, SIL Open Font License). Used when Calibri Bold is not on the system, so macOS and Linux need no `--font`.
+- `docs/INSTALL.md`: installer options, manual install and skills folders, moved out of the README.
+
+### Changed
+- README: the English part comes first and the full Turkish version is at the end; new Why, FAQ and License sections.
+
 ## [2.0.0] - 2026-10-30
 
 ### Changed
@@ -63,6 +73,7 @@ All notable changes to Reelsmith. The format follows [Keep a Changelog](https://
 ### Added
 - First release: Instagram Reel from a folder with local Whisper captions, HyperFrames edit, moving logo watermark and a balanced audio mix.
 
+[2.1.0]: https://github.com/EmirhanYAZICI/reelsmith-media/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/EmirhanYAZICI/reelsmith-media/compare/v1.3.2...v2.0.0
 [1.3.2]: https://github.com/EmirhanYAZICI/reelsmith-media/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/EmirhanYAZICI/reelsmith-media/compare/v1.3.0...v1.3.1

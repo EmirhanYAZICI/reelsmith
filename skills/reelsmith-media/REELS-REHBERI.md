@@ -101,7 +101,7 @@ $PY scripts/build_video.py --src="$SRC" --name=<konu>_reels_final.mp4 --no-rende
 $PY scripts/build_video.py --src="$SRC" --name=<konu>_reels_final.mp4 --skip-prep   # render
 ```
 - `--src=` kaynak klasör (zorunlu). Seslendirme ve logo otomatik bulunur. Bulamazsa `--vo=<dosya>` / `--logo=<dosya>` ver.
-- Font: Calibri Bold Windows'tan (`C:\Windows\Fonts\calibrib.ttf`) kopyalanır. Lisans gereği repoda yok. Başka sistemde `--font=<yol>`.
+- Font: Windows'ta Calibri Bold (`C:\Windows\Fonts\calibrib.ttf`), yoksa repodaki Carlito Bold (`fonts/Carlito-Bold.ttf`, Calibri ile aynı ölçüler, OFL lisanslı). Başka font için `--font=<yol>`.
 - `--skip-prep` hazırlanmış klipleri tekrar işlemez. Sadece kompozisyon değişince ya da render yarıda kesilince kullan (klipler hazırsa kaldığı yerden devam eder).
 - Logo seçenekleri: `--logo-mode`, `--logo-pos`, `--logo-size`, `--logo-moves` (bkz. Logo bölümü). İki komutta da aynı verilmeli.
 - Bir araç yoksa ya da ffmpeg hata verirse script hangi adımda ve hangi dosyada olduğunu yazıp durur (Python izi değil).
@@ -214,6 +214,6 @@ HyperFrames kuralları (bozma):
 | `transcriber` PyAV hatası | `scripts/transcribe.py` kullan (ffmpeg ile çözer). |
 | "Eksik sahne videoları: [n]" | Dosya adında sahne numarası yok. Kullanıcıya sor, adı değiştirmeden `sahneler\` alt klasörüne doğru adla kopya koy. |
 | Altyazıda iki cümle tek blokta | `align.py` cümle sonunda zaten böler. Metinde noktalama eksik olabilir. |
-| "Font bulunamadı" | Calibri Bold yolunu `--font=` ile ver. |
+| "Font bulunamadı" | `--font=` ile verilen yol yanlış. Yolu düzelt ya da `--font` vermeden çalıştır (Calibri ya da Carlito kullanılır). |
 | Font lint hatası | Kullanılan her font için `@font-face` olmalı, yedek font adı yazma. |
 | Sahne metni farklı formatta | `align.py` `Metin karşılığı: "…")` arar. Farklıysa `scene_texts()` regex'ini uyarla. |

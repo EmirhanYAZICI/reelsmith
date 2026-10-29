@@ -17,6 +17,7 @@ skills/reelsmith-media/template/composition_video/.hyperframes/
 *.mp3
 *.ttf
 *.otf
+!skills/reelsmith-media/template/fonts/*.ttf
 
 # Sistem
 .DS_Store

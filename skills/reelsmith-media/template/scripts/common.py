@@ -8,6 +8,17 @@ from pathlib import Path
 VIDEO_EXT = {".mp4", ".mov", ".webm", ".mkv"}
 AUDIO_EXT = {".mp3", ".wav", ".m4a"}
 
+# ---------- altyazı fontu ----------
+CALIBRI = Path(r"C:\Windows\Fonts\calibrib.ttf")
+CARLITO = Path(__file__).resolve().parent.parent / "fonts" / "Carlito-Bold.ttf"  # Calibri ile aynı ölçüler, OFL
+
+
+def caption_font(given: str = "") -> Path:
+    """--font verildiyse o; yoksa sistemde Calibri Bold varsa o; yoksa repodaki Carlito Bold."""
+    if given:
+        return Path(given)
+    return CALIBRI if CALIBRI.is_file() else CARLITO
+
 # ---------- sahne videoları ----------
 ORDINALS = {"birinci": 1, "ilk": 1, "ikinci": 2, "üçüncü": 3, "ucuncu": 3, "dördüncü": 4, "dorduncu": 4,
             "beşinci": 5, "besinci": 5, "altıncı": 6, "altinci": 6, "yedinci": 7,
