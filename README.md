@@ -72,6 +72,34 @@ No API keys are needed. Everything runs locally.
 
 ### Install
 
+**Quick install (recommended)**
+
+One command checks the tools, gets OpenMontage, creates its Python 3.12 environment, installs `faster-whisper`, HyperFrames and its skills, and copies the skills into every agent it finds (Claude Code, Codex, OpenCode, Cursor, Antigravity).
+
+```powershell
+# Windows (PowerShell)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+```
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+```
+
+From a clone: `.\install.ps1` or `./install.sh`. Options:
+
+| PowerShell | Bash | Effect |
+|---|---|---|
+| `-Agents claude,cursor` | `--agents=claude,cursor` | Pick agents (`auto` = found on this machine, `all`) |
+| `-Project` | `--project` | Install into the current project folder instead of your home |
+| `-OM <path>` | `--om=<path>` | OpenMontage location |
+| `-SkillsOnly` | `--skills-only` | Copy the skills only, skip dependencies |
+| `-DryRun` | `--dry-run` | Show what would happen, change nothing |
+
+The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It only replaces the `reelsmith` and `whisper-tr` folders in each skills folder.
+
+The manual steps below do the same thing by hand.
+
 **1. Shared dependencies (once)**
 
 ```bash
@@ -136,6 +164,7 @@ To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](
 | `skills/whisper-tr/` | Companion skill: local Whisper transcription with word timestamps |
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests |
 | `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
+| `install.ps1`, `install.sh` | One-command installer (Windows / macOS, Linux, Git Bash) |
 
 ### Origin
 
@@ -204,6 +233,26 @@ Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPT
 API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 ### Kurulum
+
+**Hızlı kurulum (önerilen)**
+
+Tek komut araçları kontrol eder, OpenMontage'ı indirir, Python 3.12 ortamını kurar, `faster-whisper`, HyperFrames ve skill'lerini yükler. Sonra skill'leri bilgisayarda bulduğu her ajana kopyalar (Claude Code, Codex, OpenCode, Cursor, Antigravity).
+
+```powershell
+# Windows (PowerShell)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+```
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+```
+
+Repo indirildiyse: `.\install.ps1` ya da `./install.sh`. Seçenekler yukarıdaki İngilizce tabloda (`-Agents`, `-Project`, `-OM`, `-SkillsOnly`, `-DryRun`).
+
+Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Skill klasörlerinde sadece `reelsmith` ve `whisper-tr` klasörlerini değiştirir.
+
+Aşağıdaki elle kurulum adımları aynı işi tek tek yapar.
 
 **1. Ortak bağımlılıklar (bir kere)**
 

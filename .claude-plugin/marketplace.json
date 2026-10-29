@@ -9,7 +9,7 @@
       "name": "reelsmith",
       "source": "./",
       "description": "Instagram Reels from a folder: local Whisper captions, HyperFrames edit, moving logo watermark, 30 fps.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "license": "MIT"
     }
   ]
