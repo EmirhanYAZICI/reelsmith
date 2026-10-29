@@ -1,15 +1,15 @@
 {
-  "name": "reelsmith",
+  "name": "reelsmith-media",
   "owner": {
     "name": "Emirhan Yazıcı",
     "url": "https://github.com/EmirhanYAZICI"
   },
   "plugins": [
     {
-      "name": "reelsmith",
+      "name": "reelsmith-media",
       "source": "./",
       "description": "Instagram Reels from a folder: local Whisper captions, HyperFrames edit, moving logo watermark, 30 fps.",
-      "version": "1.3.2",
+      "version": "2.0.0",
       "license": "MIT"
     }
   ]

@@ -1,4 +1,4 @@
-# Reelsmith Rehberi (genel komut, firma bağımsız)
+# Reelsmith Media Rehberi (genel komut, firma bağımsız)
 
 > Her firma/marka için aynı akış. Marka = klasördeki logo. Firma adı ya da logo koda sabit yazılmaz.
 
@@ -9,7 +9,7 @@
 
 ## 0. Kullanıcı nasıl başlatır (tek mesaj)
 
-OpenMontage repo kökünde Claude Code aç ve yaz (ya da `/reelsmith <klasör>`):
+OpenMontage repo kökünde Claude Code aç ve yaz (ya da `/reelsmith-media <klasör>`):
 
 ```
 <klasör yolu> klasörünü kullan. REELS-REHBERI.md'yi oku ve ona göre yap.
@@ -69,7 +69,7 @@ Skill'deki şablonu yeni proje olarak kopyala:
 
 ```bash
 cd <OpenMontage>/projects
-cp -r <reelsmith skill klasörü>/template <yeni-proje-id>
+cp -r <reelsmith-media skill klasörü>/template <yeni-proje-id>
 mkdir -p <yeni-proje-id>/artifacts <yeni-proje-id>/assets/audio && cd <yeni-proje-id>
 PY=../../.venv/Scripts/python.exe          # Linux/macOS: ../../.venv/bin/python
 export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1

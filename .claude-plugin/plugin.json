@@ -1,13 +1,13 @@
 {
-  "name": "reelsmith",
-  "version": "1.3.2",
+  "name": "reelsmith-media",
+  "version": "2.0.0",
   "description": "Turn a voiceover, numbered scene clips, a scene script and a logo into a finished 1080x1920 / 30 fps Instagram Reel: local Whisper captions, HyperFrames edit, moving logo watermark, balanced audio mix.",
   "author": {
     "name": "Emirhan Yazıcı",
     "url": "https://github.com/EmirhanYAZICI"
   },
-  "homepage": "https://github.com/EmirhanYAZICI/reelsmith",
-  "repository": "https://github.com/EmirhanYAZICI/reelsmith",
+  "homepage": "https://github.com/EmirhanYAZICI/reelsmith-media",
+  "repository": "https://github.com/EmirhanYAZICI/reelsmith-media",
   "license": "MIT",
   "keywords": ["instagram-reels", "video-editing", "whisper", "captions", "hyperframes", "openmontage", "ffmpeg"]
 }

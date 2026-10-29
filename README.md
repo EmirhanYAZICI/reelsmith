@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.svg" width="100%" alt="Reelsmith: an AI agent turns a folder with a voiceover, scene clips, a script and a logo into a captioned 1080x1920 Instagram Reel"/>
+<img src="assets/banner.svg" width="100%" alt="Reelsmith Media: an AI agent turns a folder with a voiceover, scene clips, a script and a logo into a captioned 1080x1920 Instagram Reel"/>
 
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=23F7DD&center=true&vCenter=true&width=900&lines=Folder+in.+Instagram+Reel+out.;Local+Whisper+captions%2C+no+API+keys;Claude+Code%2C+Codex%2C+Cursor%2C+OpenCode%2C+Antigravity" alt="Folder in. Instagram Reel out."/>
 
@@ -12,7 +12,7 @@
 <a href="#cost"><img src="https://img.shields.io/badge/Paid_API-none-2EA44F?style=for-the-badge&labelColor=000000" alt="No paid API"/></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=000000" alt="MIT License"/></a>
 <br/>
-<a href="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml"><img src="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
+<a href="https://github.com/EmirhanYAZICI/reelsmith-media/actions/workflows/ci.yml"><img src="https://github.com/EmirhanYAZICI/reelsmith-media/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
 
 An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.<br/>
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
@@ -25,8 +25,8 @@ Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten aj
 
 ## Demo
 
-A real project made with Reelsmith: a 7-scene, 2:22 Reel about the gemstone "Zebercet" (peridot) for Taş Galerisi.<br/>
-Reelsmith ile yapılmış gerçek bir proje: Taş Galerisi için "Zebercet" taşı hakkında 7 sahneli, 2:22'lik bir Reels.
+A real project made with Reelsmith Media: a 7-scene, 2:22 Reel about the gemstone "Zebercet" (peridot) for Taş Galerisi.<br/>
+Reelsmith Media ile yapılmış gerçek bir proje: Taş Galerisi için "Zebercet" taşı hakkında 7 sahneli, 2:22'lik bir Reels.
 
 <div align="center">
 
@@ -34,7 +34,7 @@ Reelsmith ile yapılmış gerçek bir proje: Taş Galerisi için "Zebercet" taş
 
 <img src="assets/demo-frames.jpg" width="100%" alt="Five frames from the finished Reel, each with word-timed yellow captions and the moving logo"/>
 
-**[Watch the full Reel (2:22, 48 MB) / Videonun tamamını izle](https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.0/reelsmith-demo-zebercet.mp4)**
+**[Watch the full Reel (2:22, 48 MB) / Videonun tamamını izle](https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v1.3.0/reelsmith-demo-zebercet.mp4)**
 
 </div>
 
@@ -63,52 +63,52 @@ The only tokens spent are your agent's. The agent reads about 20K tokens of inst
 
 ```powershell
 # Windows (PowerShell)
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.ps1)))
 ```
 
 ```bash
 # macOS / Linux / Git Bash
-curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.sh | bash
 ```
 
 Prefer to read the script before it runs, or want a fixed version? Download the release, check its SHA-256, read `install.ps1` / `install.sh`, then run it from the folder (it uses the downloaded files and clones nothing):
 
 ```powershell
 # Windows (PowerShell)
-irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/reelsmith-v1.3.2.zip -OutFile reelsmith-v1.3.2.zip
-irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/SHA256SUMS.txt -OutFile SHA256SUMS.txt
-(Get-FileHash reelsmith-v1.3.2.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
-Expand-Archive reelsmith-v1.3.2.zip .; notepad reelsmith\install.ps1
-powershell -ExecutionPolicy Bypass -File reelsmith\install.ps1
+irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/reelsmith-media-v2.0.0.zip -OutFile reelsmith-media-v2.0.0.zip
+irm https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/SHA256SUMS.txt -OutFile SHA256SUMS.txt
+(Get-FileHash reelsmith-media-v2.0.0.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
+Expand-Archive reelsmith-media-v2.0.0.zip .; notepad reelsmith-media\install.ps1
+powershell -ExecutionPolicy Bypass -File reelsmith-media\install.ps1
 ```
 
 ```bash
 # macOS / Linux / Git Bash
-curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/reelsmith-v1.3.2.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/SHA256SUMS.txt
+curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/reelsmith-media-v2.0.0.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith-media/releases/download/v2.0.0/SHA256SUMS.txt
 sha256sum -c SHA256SUMS.txt --ignore-missing      # macOS: shasum -a 256 -c SHA256SUMS.txt --ignore-missing
-unzip -q reelsmith-v1.3.2.zip && less reelsmith/install.sh
-./reelsmith/install.sh
+unzip -q reelsmith-media-v2.0.0.zip && less reelsmith-media/install.sh
+./reelsmith-media/install.sh
 ```
 
-The installer never deletes your edits: if an installed `reelsmith` or `whisper-tr` folder differs from the new one, it is moved to `~/.reelsmith-backups/<time>/` first. It requires Python 3.10-3.12 and stops with a clear message otherwise.
+The installer never deletes your edits: if an installed `reelsmith-media` or `whisper-tr` folder differs from the new one, it is moved to `~/.reelsmith-backups/<time>/` first. It requires Python 3.10-3.12 and stops with a clear message otherwise.
 
 **2. Or install for one agent only.**
 
 | Agent | Install | Then |
 |---|---|---|
-| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith`<br/>`/plugin install reelsmith@reelsmith` | Type `/reelsmith my-brand` |
-| **OpenAI Codex CLI** | installer with `-Agents codex` / `--agents=codex` | Ask: *use the reelsmith skill on my-brand* |
-| **Cursor** | installer with `-Agents cursor` / `--agents=cursor` | Ask in Agent chat: *use the reelsmith skill on my-brand* |
-| **OpenCode** | installer with `-Agents opencode` / `--agents=opencode` | Ask: *use the reelsmith skill on my-brand* |
-| **Google Antigravity** | installer with `-Agents antigravity` / `--agents=antigravity` | Ask: *use the reelsmith skill on my-brand* |
-| **Any other agent** | `npx skills add EmirhanYAZICI/reelsmith` | It reads [`AGENTS.md`](AGENTS.md) if it has no skill support |
+| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith-media`<br/>`/plugin install reelsmith-media@reelsmith-media` | Type `/reelsmith-media my-brand` |
+| **OpenAI Codex CLI** | installer with `-Agents codex` / `--agents=codex` | Ask: *use the reelsmith-media skill on my-brand* |
+| **Cursor** | installer with `-Agents cursor` / `--agents=cursor` | Ask in Agent chat: *use the reelsmith-media skill on my-brand* |
+| **OpenCode** | installer with `-Agents opencode` / `--agents=opencode` | Ask: *use the reelsmith-media skill on my-brand* |
+| **Google Antigravity** | installer with `-Agents antigravity` / `--agents=antigravity` | Ask: *use the reelsmith-media skill on my-brand* |
+| **Any other agent** | `npx skills add EmirhanYAZICI/reelsmith-media` | It reads [`AGENTS.md`](AGENTS.md) if it has no skill support |
 
 For one agent with the installer: `.\install.ps1 -Agents codex` or `./install.sh --agents=codex` (from a clone of this repo).
 
-**3. Prepare your material.** Reelsmith edits your clips; it does not generate them. Make them first:
+**3. Prepare your material.** Reelsmith Media edits your clips; it does not generate them. Make them first:
 
 1. **Write the script, scene by scene.** Split the narration into scenes (5-10 is typical). Each scene's text is exactly what the voiceover says during that scene.
-2. **Generate one clip per scene, in order,** with any video tool: Google Gemini (Veo), Kling, Runway, Sora, or your own footage. Vertical 9:16, about 8-10 seconds each. Write each prompt from that scene's text. The clips can keep their own music and sound effects; Reelsmith keeps them and lowers them under the voice.
+2. **Generate one clip per scene, in order,** with any video tool: Google Gemini (Veo), Kling, Runway, Sora, or your own footage. Vertical 9:16, about 8-10 seconds each. Write each prompt from that scene's text. The clips can keep their own music and sound effects; Reelsmith Media keeps them and lowers them under the voice.
 3. **Name the clips by scene number:** `scene1.mp4`, `scene2.mp4`, ... (or `1sahne.mp4`). The number decides which scene a clip belongs to. Two clips for one scene: `scene3.mp4` and `scene3_b.mp4`.
 4. **Record or generate the voiceover** reading the script, in the same order.
 5. **Add your logo** as a transparent `logo.png`.
@@ -134,13 +134,13 @@ my-brand/
 ```
 
 ```
-/reelsmith my-brand reel.mp4 white text, box style, word by word
+/reelsmith-media my-brand reel.mp4 white text, box style, word by word
 ```
 
 Before anything slow starts, the agent runs a preflight check and tells you what is missing or broken (a missing scene number, a corrupt clip, no logo, a missing tool). You can run it yourself too:
 
 ```bash
-python skills/reelsmith/template/scripts/check.py --src=~/Desktop/my-brand
+python skills/reelsmith-media/template/scripts/check.py --src=~/Desktop/my-brand
 ```
 
 The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it. No API keys are needed. Everything runs on your machine.
@@ -151,33 +151,33 @@ The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to
 
 ```powershell
 # Windows (PowerShell)
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.ps1)))
 ```
 
 ```bash
 # macOS / Linux / Git Bash
-curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.sh | bash
 ```
 
 Script'i çalışmadan önce okumak ya da sabit bir sürüm kurmak istersen: Release'i indir, SHA-256 değerini kontrol et, `install.ps1` / `install.sh` dosyasını oku, sonra klasörden çalıştır (indirilen dosyaları kullanır, başka bir şey indirmez). Komutlar yukarıdaki İngilizce bölümde aynı.
 
-Kurulum aracı senin değişikliklerini silmez: kurulu `reelsmith` ya da `whisper-tr` klasörü yenisinden farklıysa önce `~/.reelsmith-backups/<zaman>/` içine taşınır. Python 3.10-3.12 ister, başka sürümde açık bir mesajla durur.
+Kurulum aracı senin değişikliklerini silmez: kurulu `reelsmith-media` ya da `whisper-tr` klasörü yenisinden farklıysa önce `~/.reelsmith-backups/<zaman>/` içine taşınır. Python 3.10-3.12 ister, başka sürümde açık bir mesajla durur.
 
 **2. Ya da sadece tek bir ajana kur.**
 
 | Ajan | Kurulum | Sonra |
 |---|---|---|
-| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith`<br/>`/plugin install reelsmith@reelsmith` | `/reelsmith markam` yaz |
-| **OpenAI Codex CLI** | kurulum aracı `-Agents codex` / `--agents=codex` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
-| **Cursor** | kurulum aracı `-Agents cursor` / `--agents=cursor` | Agent sohbetinde yaz: *markam klasöründe reelsmith skill'ini kullan* |
-| **OpenCode** | kurulum aracı `-Agents opencode` / `--agents=opencode` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
-| **Google Antigravity** | kurulum aracı `-Agents antigravity` / `--agents=antigravity` | Yaz: *markam klasöründe reelsmith skill'ini kullan* |
-| **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith` | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
+| **Claude Code** | `/plugin marketplace add EmirhanYAZICI/reelsmith-media`<br/>`/plugin install reelsmith-media@reelsmith-media` | `/reelsmith-media markam` yaz |
+| **OpenAI Codex CLI** | kurulum aracı `-Agents codex` / `--agents=codex` | Yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
+| **Cursor** | kurulum aracı `-Agents cursor` / `--agents=cursor` | Agent sohbetinde yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
+| **OpenCode** | kurulum aracı `-Agents opencode` / `--agents=opencode` | Yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
+| **Google Antigravity** | kurulum aracı `-Agents antigravity` / `--agents=antigravity` | Yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
+| **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith-media` | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
 
-**3. Malzemeyi hazırla.** Reelsmith kliplerini kurgular, klip üretmez. Önce onları hazırla:
+**3. Malzemeyi hazırla.** Reelsmith Media kliplerini kurgular, klip üretmez. Önce onları hazırla:
 
 1. **Metni sahne sahne yaz.** Anlatımı sahnelere böl (genelde 5-10 sahne). Her sahnenin metni, o sahnede seslendirmede okunan yazının aynısı olsun.
-2. **Her sahne için sırayla bir video üret:** Google Gemini (Veo), Kling, Runway, Sora ya da kendi çekimin. Dikey 9:16, her biri 8-10 saniye. Her videonun komutunu (prompt) o sahnenin metnine göre yaz. Videoların kendi müziği ve efekti olabilir; Reelsmith onları korur ve konuşma sırasında kısar.
+2. **Her sahne için sırayla bir video üret:** Google Gemini (Veo), Kling, Runway, Sora ya da kendi çekimin. Dikey 9:16, her biri 8-10 saniye. Her videonun komutunu (prompt) o sahnenin metnine göre yaz. Videoların kendi müziği ve efekti olabilir; Reelsmith Media onları korur ve konuşma sırasında kısar.
 3. **Videoları sahne numarasıyla adlandır:** `1sahne.mp4`, `2sahne.mp4`, ... (ya da `scene1.mp4`). Hangi videonun hangi sahneye gideceğini numara belirler. Bir sahneye iki video: `3sahne.mp4` ve `3sahne_b.mp4`.
 4. **Seslendirmeyi** aynı sırayla metni okuyarak kaydet ya da ürettir.
 5. **Logonu** şeffaf `logo.png` olarak ekle.
@@ -203,13 +203,13 @@ markam/
 ```
 
 ```
-/reelsmith markam reels.mp4 beyaz yazı, kutulu, kelime kelime hoplasın
+/reelsmith-media markam reels.mp4 beyaz yazı, kutulu, kelime kelime hoplasın
 ```
 
 Uzun işler başlamadan önce ajan bir ön kontrol çalıştırır ve eksik ya da bozuk olanı söyler (eksik sahne numarası, bozuk klip, logo yok, eksik araç). İstersen kendin de çalıştırabilirsin:
 
 ```bash
-python skills/reelsmith/template/scripts/check.py --src=~/Desktop/markam
+python skills/reelsmith-media/template/scripts/check.py --src=~/Desktop/markam
 ```
 
 Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne kaydedilir. API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
@@ -223,7 +223,7 @@ Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne 
 You put a voiceover, numbered scene clips, a scene script and your logo in a folder. Then you ask your agent:
 
 ```
-/reelsmith my-folder my_reel.mp4
+/reelsmith-media my-folder my_reel.mp4
 ```
 
 The skill then does the following:
@@ -260,8 +260,8 @@ Captions always sit in the same place: Calibri Bold 75 px, 450 px from the botto
 | `--caption-style` | `outline` | `outline`, `box`, `shadow`, `double` |
 | `--caption-anim` | `pop` | `pop`, `hop`, `word-hop` (each word jumps in exactly when it is spoken), `bounce`, `wave` |
 
-Through an agent, you can describe the captions in plain words, for example: `/reelsmith my-folder white text, boxed, words hop in one by one`.
-See [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md) for the full list and ready-made presets.
+Through an agent, you can describe the captions in plain words, for example: `/reelsmith-media my-folder white text, boxed, words hop in one by one`.
+See [`CAPTION-STYLES.md`](skills/reelsmith-media/CAPTION-STYLES.md) for the full list and ready-made presets.
 
 ### Logo: moving, fixed or intro/outro
 
@@ -272,7 +272,7 @@ See [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md) for the full list 
 | `--logo-size` | `258` | width in px, 80-700 |
 | `--logo-moves` | `6` | how many corner-to-corner moves over the whole video (fewer = slower) |
 
-The logo is always used as uploaded: original colors, full opacity, no effects. You can say it in words too: `/reelsmith my-folder logo fixed top right, also big at the start and end`.
+The logo is always used as uploaded: original colors, full opacity, no effects. You can say it in words too: `/reelsmith-media my-folder logo fixed top right, also big at the start and end`.
 
 ### Requirements
 
@@ -304,7 +304,7 @@ From a clone: `.\install.ps1` or `./install.sh`. Options:
 | `-NoBackup` | `--no-backup` | Replace changed skill folders without keeping a backup |
 | `-DryRun` | `--dry-run` | Show what would happen, change nothing |
 
-The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.10-3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It checks the real version of the Python it would use (and of an existing `.venv`), not just the command name. It only touches the `reelsmith` and `whisper-tr` folders in each skills folder: identical copies are left alone, changed ones are backed up first.
+The installer does not install system tools for you. If `git`, `node`, `ffmpeg` or Python 3.10-3.12 is missing, it stops and prints the command (`winget`, `brew`, `apt`). It checks the real version of the Python it would use (and of an existing `.venv`), not just the command name. It only touches the `reelsmith-media` and `whisper-tr` folders in each skills folder: identical copies are left alone, changed ones are backed up first.
 
 The manual steps below do the same thing by hand.
 
@@ -323,9 +323,9 @@ If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` env
 
 | Tool | Install |
 |---|---|
-| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith`, then `/plugin install reelsmith@reelsmith` |
-| Any supported agent | `npx skills add EmirhanYAZICI/reelsmith` (the open [skills](https://skills.sh) CLI; it asks which agents to install for) |
-| Manual | Copy `skills/reelsmith` and `skills/whisper-tr` into your tool's skills folder (table below) |
+| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith-media`, then `/plugin install reelsmith-media@reelsmith-media` |
+| Any supported agent | `npx skills add EmirhanYAZICI/reelsmith-media` (the open [skills](https://skills.sh) CLI; it asks which agents to install for) |
+| Manual | Copy `skills/reelsmith-media` and `skills/whisper-tr` into your tool's skills folder (table below) |
 
 | Tool | Skills folder (user-wide / per project) |
 |---|---|
@@ -338,7 +338,7 @@ If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` env
 Folder names can change between tool versions. If a path does not work, check your tool's docs or use `npx skills add`.
 Tools that do not load skills still read [`AGENTS.md`](AGENTS.md), which points them to the right `SKILL.md`.
 
-To check the install in Claude Code, type `/`. You should see `reelsmith` and `whisper-tr`.
+To check the install in Claude Code, type `/`. You should see `reelsmith-media` and `whisper-tr`.
 
 ### Usage
 
@@ -355,11 +355,11 @@ To check the install in Claude Code, type `/`. You should see `reelsmith` and `w
    You can use any number of scenes. The number of clips must match the number of script entries.
 2. Ask your agent:
    ```
-   /reelsmith <folder name or path> <output_name>.mp4 [caption wishes]
+   /reelsmith-media <folder name or path> <output_name>.mp4 [caption wishes]
    ```
 3. Clip preparation and rendering take about 15-25 minutes. The finished video is copied into your folder and into a `cikti/` folder next to it.
 
-To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md).
+To run it by hand without an agent, see step 3 in [`skills/reelsmith-media/SKILL.md`](skills/reelsmith-media/SKILL.md).
 
 ### Supported and not supported
 
@@ -384,22 +384,22 @@ The tests cover scene file names, script parsing, caption and logo options, Whis
 
 What was tested where, installer scenarios, the end-to-end render and what is not covered yet: [`TESTING.md`](TESTING.md).
 
-Found a bug? Open an [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) and paste the preflight output.
+Found a bug? Open an [issue](https://github.com/EmirhanYAZICI/reelsmith-media/issues/new/choose) and paste the preflight output.
 
 ### Repository layout
 
 | Path | Purpose |
 |---|---|
-| `skills/reelsmith/SKILL.md` | The steps the agent follows |
-| `skills/reelsmith/REELS-REHBERI.md` | Every setting: captions, logo, camera, audio, format, troubleshooting (Turkish) |
-| `skills/reelsmith/CAPTION-STYLES.md` | Caption colors, styles, animations and presets (English / Turkish) |
-| `skills/reelsmith/template/` | Python scripts and the HyperFrames template copied into each project |
+| `skills/reelsmith-media/SKILL.md` | The steps the agent follows |
+| `skills/reelsmith-media/REELS-REHBERI.md` | Every setting: captions, logo, camera, audio, format, troubleshooting (Turkish) |
+| `skills/reelsmith-media/CAPTION-STYLES.md` | Caption colors, styles, animations and presets (English / Turkish) |
+| `skills/reelsmith-media/template/` | Python scripts and the HyperFrames template copied into each project |
 | `skills/whisper-tr/` | Companion skill: local Whisper transcription with word timestamps |
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests |
 | `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
 | `install.ps1`, `install.sh` | One-command installer (Windows / macOS, Linux, Git Bash) |
-| `skills/reelsmith/template/scripts/check.py` | Preflight check: tools, clips, voiceover, logo, script |
-| `skills/reelsmith/template/scripts/verify.py` | Output check after render: size, fps, codecs, loudness, peak, freezes, faststart |
+| `skills/reelsmith-media/template/scripts/check.py` | Preflight check: tools, clips, voiceover, logo, script |
+| `skills/reelsmith-media/template/scripts/verify.py` | Output check after render: size, fps, codecs, loudness, peak, freezes, faststart |
 | `tests/`, `TESTING.md` | pytest suite and the test report |
 | `assets/` | Banner, social preview image and demo images |
 
@@ -416,7 +416,7 @@ The skill was built and tested on a real project, a 7-scene, 2:22 Reel about the
 Bir klasöre seslendirme, numaralı sahne videoları, sahne metni ve logonu koyarsın. Sonra ajanına şunu yazarsın:
 
 ```
-/reelsmith klasorum videom.mp4
+/reelsmith-media klasorum videom.mp4
 ```
 
 Skill şunları yapar:
@@ -453,8 +453,8 @@ Altyazı hep aynı yerdedir: Calibri Bold 75 px, alttan 450 px, ortalı. Sadece 
 | `--caption-style` | `outline` | `outline` (kontur), `box` (kutulu), `shadow` (gölgeli), `double` (çift kontur) |
 | `--caption-anim` | `pop` | `pop`, `hop`, `word-hop` (her kelime söylendiği anda zıplar), `bounce`, `wave` |
 
-Ajana cümleyle de söyleyebilirsin, örneğin: `/reelsmith klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
-Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md).
+Ajana cümleyle de söyleyebilirsin, örneğin: `/reelsmith-media klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
+Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith-media/CAPTION-STYLES.md).
 
 ### Logo: hareketli, sabit ya da açılış/kapanış
 
@@ -465,7 +465,7 @@ Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPT
 | `--logo-size` | `258` | px cinsinden genişlik, 80-700 |
 | `--logo-moves` | `6` | video boyunca kaç kez köşe değiştirir (az = daha yavaş) |
 
-Logo hep yüklendiği gibi kullanılır: kendi rengi, tam opak, efektsiz. Cümleyle de söyleyebilirsin: `/reelsmith klasorum logo sağ üstte sabit dursun, başta ve sonda da büyük çıksın`.
+Logo hep yüklendiği gibi kullanılır: kendi rengi, tam opak, efektsiz. Cümleyle de söyleyebilirsin: `/reelsmith-media klasorum logo sağ üstte sabit dursun, başta ve sonda da büyük çıksın`.
 
 ### Gereksinimler
 
@@ -488,7 +488,7 @@ API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 Repo indirildiyse: `.\install.ps1` ya da `./install.sh`. Seçenekler yukarıdaki İngilizce tabloda (`-Agents`, `-Project`, `-OM`, `-SkillsOnly`, `-DryRun`).
 
-Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.10-3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Kullanacağı Python'un (ve varsa mevcut `.venv`'in) gerçek sürümünü kontrol eder. Skill klasörlerinde sadece `reelsmith` ve `whisper-tr` klasörlerine dokunur: aynıysa bırakır, farklıysa önce yedekler (`-NoBackup` / `--no-backup` ile yedeksiz).
+Kurulum aracı sistem programlarını kendisi kurmaz. `git`, `node`, `ffmpeg` ya da Python 3.10-3.12 eksikse durur ve kurulum komutunu (`winget`, `brew`, `apt`) yazar. Kullanacağı Python'un (ve varsa mevcut `.venv`'in) gerçek sürümünü kontrol eder. Skill klasörlerinde sadece `reelsmith-media` ve `whisper-tr` klasörlerine dokunur: aynıysa bırakır, farklıysa önce yedekler (`-NoBackup` / `--no-backup` ile yedeksiz).
 
 Aşağıdaki elle kurulum adımları aynı işi tek tek yapar.
 
@@ -507,12 +507,12 @@ OpenMontage `~/Projects/OpenMontage` dışında bir yerdeyse `OPENMONTAGE_DIR` o
 
 | Araç | Kurulum |
 |---|---|
-| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith`, sonra `/plugin install reelsmith@reelsmith` |
-| Desteklenen her ajan | `npx skills add EmirhanYAZICI/reelsmith` (açık [skills](https://skills.sh) aracı; hangi ajanlara kurulacağını sorar) |
-| Elle | `skills/reelsmith` ve `skills/whisper-tr` klasörlerini aracının skill klasörüne kopyala (yukarıdaki İngilizce bölümdeki tablo) |
+| Claude Code (plugin) | `/plugin marketplace add EmirhanYAZICI/reelsmith-media`, sonra `/plugin install reelsmith-media@reelsmith-media` |
+| Desteklenen her ajan | `npx skills add EmirhanYAZICI/reelsmith-media` (açık [skills](https://skills.sh) aracı; hangi ajanlara kurulacağını sorar) |
+| Elle | `skills/reelsmith-media` ve `skills/whisper-tr` klasörlerini aracının skill klasörüne kopyala (yukarıdaki İngilizce bölümdeki tablo) |
 
 Araç skill yüklemiyorsa bile [`AGENTS.md`](AGENTS.md) dosyasını okur. O dosya ajanı doğru `SKILL.md`'ye yönlendirir.
-Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görünmeli.
+Claude Code'da kontrol için `/` yaz. Listede `reelsmith-media` ve `whisper-tr` görünmeli.
 
 ### Kullanım
 
@@ -529,11 +529,11 @@ Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görü
    Sahne sayısı serbesttir. Video sayısı ile metindeki sahne sayısı eşit olmalı.
 2. Ajanına şunu yaz:
    ```
-   /reelsmith <klasör adı ya da yolu> <video_adı>.mp4 [altyazı isteği]
+   /reelsmith-media <klasör adı ya da yolu> <video_adı>.mp4 [altyazı isteği]
    ```
 3. Klip hazırlığı ve render yaklaşık 15-25 dakika sürer. Bitmiş video senin klasörüne ve yanındaki `cikti/` klasörüne kopyalanır.
 
-Ajan olmadan elle çalıştırmak için [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md) içindeki 3. adıma bak.
+Ajan olmadan elle çalıştırmak için [`skills/reelsmith-media/SKILL.md`](skills/reelsmith-media/SKILL.md) içindeki 3. adıma bak.
 
 ### Desteklenenler ve desteklenmeyenler
 
@@ -558,7 +558,7 @@ Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı
 
 Nerede neyin test edildiği, kurulum senaryoları, uçtan uca render ve henüz kapsanmayanlar: [`TESTING.md`](TESTING.md).
 
-Hata mı buldun? Bir [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) aç ve ön kontrol çıktısını yapıştır.
+Hata mı buldun? Bir [issue](https://github.com/EmirhanYAZICI/reelsmith-media/issues/new/choose) aç ve ön kontrol çıktısını yapıştır.
 
 ### Nereden çıktı
 

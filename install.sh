@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Reelsmith installer for macOS, Linux and Git Bash on Windows.
+# Reelsmith Media installer for macOS, Linux and Git Bash on Windows.
 #
 #   ./install.sh                      install deps + skills for every agent found on this machine
 #   ./install.sh --agents=claude,cursor
 #   ./install.sh --agents=all --project   install into the current project folder instead of your home
-#   curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith-media/main/install.sh | bash
 #
 # Options:
 #   --agents=auto|all|claude,codex,opencode,cursor,antigravity   (default: auto = agents found on this machine)
@@ -15,14 +15,14 @@
 #   --no-backup      replace changed skill folders without keeping a backup copy
 #   --dry-run        show what would happen, change nothing
 #
-# Existing reelsmith / whisper-tr folders are left alone when identical. When they differ,
+# Existing reelsmith-media / whisper-tr folders are left alone when identical. When they differ,
 # the old copy is moved to ~/.reelsmith-backups/<time>/<agent>/ before the new one is copied.
 # Python must be 3.10-3.12 (faster-whisper); other versions stop the install with a message.
 set -euo pipefail
 
-REPO_URL="https://github.com/EmirhanYAZICI/reelsmith"
+REPO_URL="https://github.com/EmirhanYAZICI/reelsmith-media"
 OM_URL="https://github.com/calesthio/OpenMontage"
-SKILLS=(reelsmith whisper-tr)
+SKILLS=(reelsmith-media whisper-tr)
 ALL_AGENTS=(claude codex opencode cursor antigravity)
 
 AGENTS="auto"; PROJECT=0; OM="${OPENMONTAGE_DIR:-$HOME/Projects/OpenMontage}"
@@ -52,9 +52,9 @@ py_ver() { "$@" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>/dev/nu
 
 # Repo source: the folder this script is in, or a fresh clone when piped from curl.
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
-if [ ! -f "$SRC/skills/reelsmith/SKILL.md" ]; then
-  SRC="${REELSMITH_HOME:-$HOME/.reelsmith}"
-  say "Getting Reelsmith into $SRC"
+if [ ! -f "$SRC/skills/reelsmith-media/SKILL.md" ]; then
+  SRC="${REELSMITH_HOME:-$HOME/.reelsmith-media}"
+  say "Getting Reelsmith Media into $SRC"
   if [ -d "$SRC/.git" ]; then run git -C "$SRC" pull --ff-only; else run git clone --depth 1 --branch "${REELSMITH_REF:-main}" "$REPO_URL" "$SRC"; fi
 fi
 
@@ -170,10 +170,19 @@ for ag in "${LIST[@]}"; do
   dir="$(agent_dir "$ag")"
   [ -z "$dir" ] && { warn "unknown agent: $ag"; continue; }
   run mkdir -p "$dir"
+  if [ -d "$dir/reelsmith" ]; then  # renamed to reelsmith-media in 2.0.0
+    if [ "$BACKUP" = 1 ]; then
+      run mkdir -p "$BACKUP_ROOT/$ag"
+      run mv "$dir/reelsmith" "$BACKUP_ROOT/$ag/reelsmith"
+      ok "$ag/reelsmith is now reelsmith-media; the old folder was saved to $BACKUP_ROOT/$ag/reelsmith"
+    else
+      run rm -rf "${dir:?}/reelsmith"
+    fi
+  fi
   for s in "${SKILLS[@]}"; do install_skill "$ag" "$dir" "$s"; done
   ok "$ag  ->  $dir"
 done
 
 say "Done"
-echo "   Open your agent and type: /reelsmith <folder>"
+echo "   Open your agent and type: /reelsmith-media <folder>"
 echo "   Tools without skill support read AGENTS.md in this repo."
