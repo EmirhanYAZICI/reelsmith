@@ -9,6 +9,7 @@
 <img src="https://img.shields.io/badge/Whisper-local-412991?style=for-the-badge&logo=openai&logoColor=white" alt="Local Whisper"/>
 <img src="https://img.shields.io/badge/HyperFrames-GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=black" alt="HyperFrames"/>
 <img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg"/>
+<a href="#cost"><img src="https://img.shields.io/badge/Paid_API-none-2EA44F?style=for-the-badge&labelColor=000000" alt="No paid API"/></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=000000" alt="MIT License"/></a>
 <br/>
 <a href="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml"><img src="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
@@ -16,7 +17,7 @@
 An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.<br/>
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
 
-[Demo](#demo) · [Quick start](#quick-start) · [English](#english) · [Türkçe](#türkçe) · [Hızlı başlangıç](#hızlı-başlangıç)
+[Demo](#demo) · [Cost](#cost) · [Quick start](#quick-start) · [English](#english) · [Türkçe](#türkçe) · [Hızlı başlangıç](#hızlı-başlangıç)
 
 </div>
 
@@ -45,6 +46,14 @@ Reelsmith ile yapılmış gerçek bir proje: Taş Galerisi için "Zebercet" taş
 | Brand | `logo.png` | Moving watermark, corner to corner / köşeden köşeye kayan logo |
 
 Time: about 15-25 minutes for a 2-3 minute Reel on a mid-range laptop (tested on Intel i5-13420H, 16 GB RAM), mostly clip slow-motion and the render. Whisper and alignment take under a minute.
+
+## Cost
+
+No paid API, no API key, no per-video fee. Whisper, alignment, clip preparation, the HyperFrames render and the audio mix all run on your own machine.
+
+The only tokens spent are your agent's. The agent reads about 20K tokens of instructions (the skill, its guide and OpenMontage's `AGENT_GUIDE.md`) and runs around ten short commands. Video and audio never go through the model; it only sees file lists, short command output and the check results. On a subscription plan (Claude Pro/Max, ChatGPT Plus and so on) a Reel uses part of your normal limit; nothing is billed per video.
+
+Ücretli API yok, API anahtarı yok, video başı ücret yok. Whisper, eşleştirme, klip hazırlama, HyperFrames render ve ses miksajı kendi bilgisayarında çalışır. Harcanan tek şey ajanın token'ı: yaklaşık 20K token talimat okur ve on kadar kısa komut çalıştırır. Video ve ses modele gönderilmez; model yalnızca dosya listesini, kısa komut çıktılarını ve kontrol sonuçlarını görür.
 
 ---
 
