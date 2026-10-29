@@ -66,18 +66,18 @@ Prefer to read the script before it runs, or want a fixed version? Download the 
 
 ```powershell
 # Windows (PowerShell)
-irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/reelsmith-v1.3.1.zip -OutFile reelsmith-v1.3.1.zip
-irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/SHA256SUMS.txt -OutFile SHA256SUMS.txt
-(Get-FileHash reelsmith-v1.3.1.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
-Expand-Archive reelsmith-v1.3.1.zip .; notepad reelsmith\install.ps1
+irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/reelsmith-v1.3.2.zip -OutFile reelsmith-v1.3.2.zip
+irm https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/SHA256SUMS.txt -OutFile SHA256SUMS.txt
+(Get-FileHash reelsmith-v1.3.2.zip -Algorithm SHA256).Hash   # must match the line in SHA256SUMS.txt
+Expand-Archive reelsmith-v1.3.2.zip .; notepad reelsmith\install.ps1
 powershell -ExecutionPolicy Bypass -File reelsmith\install.ps1
 ```
 
 ```bash
 # macOS / Linux / Git Bash
-curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/reelsmith-v1.3.1.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.1/SHA256SUMS.txt
+curl -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/reelsmith-v1.3.2.zip -fsSLO https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.2/SHA256SUMS.txt
 sha256sum -c SHA256SUMS.txt --ignore-missing      # macOS: shasum -a 256 -c SHA256SUMS.txt --ignore-missing
-unzip -q reelsmith-v1.3.1.zip && less reelsmith/install.sh
+unzip -q reelsmith-v1.3.2.zip && less reelsmith/install.sh
 ./reelsmith/install.sh
 ```
 
