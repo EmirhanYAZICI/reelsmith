@@ -15,7 +15,8 @@ from pathlib import Path
 
 
 def opt(name: str, default: str = "") -> str:
-    return next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    v = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    return str(Path(v).expanduser()) if v.startswith("~") else v
 
 
 def ffprobe(path: Path) -> dict:
@@ -90,7 +91,7 @@ def main() -> None:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
         raise SystemExit("Kullanım: verify.py <video.mp4> [--duration=sn] [--lufs=-14] [--json]")
-    res = verify(Path(args[0]), float(opt("duration")) if opt("duration") else None, float(opt("lufs", "-14")))
+    res = verify(Path(args[0]).expanduser(), float(opt("duration")) if opt("duration") else None, float(opt("lufs", "-14")))
     if "--json" in sys.argv:
         print(json.dumps([{"level": lv, "message": m} for lv, m in res], indent=1))
     else:

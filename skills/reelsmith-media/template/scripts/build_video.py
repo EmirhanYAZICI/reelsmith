@@ -30,8 +30,9 @@ from common import (OptionError, caption_font, caption_options, group_clips, log
 COMP = ROOT / "composition_video"
 CLIPS = COMP / "assets" / "clips"
 def _opt(name: str, default: str = "") -> str:
-    """--isim=değer şeklindeki komut satırı seçeneği."""
-    return next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    """--isim=değer şeklindeki komut satırı seçeneği. ~ ile başlayan yollar açılır (--src=~/Desktop/x)."""
+    v = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    return str(Path(v).expanduser()) if v.startswith("~") else v
 
 
 if not _opt("src"):
@@ -296,8 +297,8 @@ def main() -> None:
         shutil.copy2(final, dst)
         print("kopyalandı:", dst)
     print("\nçıktı kontrolü / output check:")  # FAIL olsa da video kopyalanmış olur; sonucu kullanıcıya söyle
-    subprocess.run([sys.executable, str(Path(__file__).parent / "verify.py"), str(final),
-                    f"--duration={TL['duration']:.3f}"])
+    sys.exit(subprocess.run([sys.executable, str(Path(__file__).parent / "verify.py"), str(final),
+                             f"--duration={TL['duration']:.3f}"]).returncode)
 
 
 if __name__ == "__main__":

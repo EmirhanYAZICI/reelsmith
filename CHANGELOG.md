@@ -8,6 +8,11 @@ All notable changes to Reelsmith. The format follows [Keep a Changelog](https://
 - `--language` for `transcribe.py` (both skills): any language Whisper supports, or `auto`. Turkish stays the default.
 - Bundled caption font: Carlito Bold (same metrics as Calibri, SIL Open Font License). Used when Calibri Bold is not on the system, so macOS and Linux need no `--font`.
 - `docs/INSTALL.md`: installer options, manual install and skills folders, moved out of the README.
+- End-to-end CI job on Ubuntu: an espeak-ng voiceover goes through real Whisper, alignment, the HyperFrames render and the output check (`tests/e2e_render.py`).
+
+### Fixed
+- Paths starting with `~` (for example `--src=~/Desktop/my-brand`) are expanded in every script; before, the shell left them unexpanded after `=`.
+- `build_video.py` exits with the output check's result, so a failed check is no longer reported as success.
 
 ### Changed
 - README: the English part comes first and the full Turkish version is at the end; new Why, FAQ and License sections.

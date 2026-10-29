@@ -1,4 +1,5 @@
 """Ön kontrol (check.py) gerçek, küçük medya dosyalarıyla."""
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -57,3 +58,12 @@ def test_missing_folder_fails(tmp_path):
     (tmp_path / "font.ttf").write_bytes(b"x")
     code, out = run_check(tmp_path / "nope")
     assert code == 1 and "source folder not found" in out
+
+
+def test_tilde_in_src_is_expanded(source_folder):
+    home = source_folder.parent
+    env = {**os.environ, "HOME": str(home), "USERPROFILE": str(home)}
+    out = subprocess.run([sys.executable, str(SCRIPTS / "check.py"), f"--src=~/{source_folder.name}",
+                          f"--font={home / 'font.ttf'}", "--skip-tools"],
+                         capture_output=True, text=True, encoding="utf-8", env=env)
+    assert out.returncode == 0, out.stdout + out.stderr

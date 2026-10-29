@@ -94,3 +94,35 @@ jobs:
             }
             "ok $d"
           }
+
+  render:
+    name: End-to-end render (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONIOENCODING: utf-8
+      HF_HUB_DISABLE_XET: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install ffmpeg, espeak-ng and HyperFrames
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg espeak-ng
+          npm i -g hyperframes@0.8
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Speak the test script
+        run: espeak-ng -v en-us -s 140 -w voice.wav "This green stone comes from deep inside the Earth. Volcanoes carry its crystals up to the surface."
+
+      - name: Whisper, align, build, render, verify
+        run: python tests/e2e_render.py voice.wav --language=en

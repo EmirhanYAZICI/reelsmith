@@ -36,6 +36,9 @@ The first CI run caught a real bug: newer ffmpeg builds (Windows runner) removed
 
 ## End-to-end render
 
+`tests/e2e_render.py` makes a real Reel from scratch: two generated clips, a spoken voiceover, a script and a logo go through the preflight check, real Whisper, alignment, the HyperFrames render, the audio mix and `verify.py`. CI runs it on Ubuntu on every change with an espeak-ng voiceover and the bundled Carlito font. On Windows 11 it was run with a Windows speech voiceover: all 9 output checks passed (1080x1920, 30 fps, -14.7 LUFS, true peak -1.1 dBFS).
+
+
 | Project | Machine | Result |
 |---|---|---|
 | Zebercet / Taş Galerisi, 7 scenes, 2:22 | Windows 11, Intel i5-13420H, 16 GB RAM, Python 3.12.9, ffmpeg 8.1.1, HyperFrames 0.8.216 | `verify.py`: 1080x1920, 30 fps, H.264 + AAC 48 kHz, -14.5 LUFS, true peak -0.9 dBFS, 0 frozen sections, faststart. All checks passed |
@@ -48,6 +51,4 @@ The alignment code was refactored in 1.3.0; re-running it on the Zebercet transc
 
 ## Not covered yet
 
-- A full HyperFrames render inside CI (it needs Chromium and takes minutes; the composition is linted instead).
-- Real Whisper transcription inside CI (the model download is large; alignment is tested with Whisper-shaped data).
-- macOS and Linux end-to-end renders (installer and unit tests only).
+- A macOS end-to-end render (the installer runs on macOS in CI; the render job runs on Ubuntu).

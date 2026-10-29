@@ -111,7 +111,7 @@ def build_timeline(scenes: list[str], hyp: list[dict], duration: float | None = 
 def main() -> None:
     if len(sys.argv) < 2:
         raise SystemExit("Kullanım: align.py <sahne metni.txt>")
-    scenes = scene_texts(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    scenes = scene_texts(Path(sys.argv[1]).expanduser().read_text(encoding="utf-8"))
     data = json.loads(TRANSCRIPT.read_text(encoding="utf-8"))
     hyp = [w for w in data["word_timestamps"] if w.get("word", "").strip()]
     try:
