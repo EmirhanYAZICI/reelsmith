@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Reels</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="data.js"></script>
+    <style>
+      @font-face {
+        font-family: "CaptionCalibri";
+        src: url("assets/calibrib.ttf") format("truetype");
+        font-weight: 700;
+      }
+      :root {
+        --logo-h: 114px; /* build_video.py logonun oranına göre yazar */
+        --olive: #7a9a01;
+        --gold: #d4af37;
+        --peridot: #b8e04a;
+      }
+      body {
+        margin: 0;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+      }
+      #bg-clip {
+        position: absolute;
+        inset: 0;
+        background: #000;
+      }
+      .seg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        opacity: 0;
+      }
+      #fx-clip {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #fx {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+      }
+      #grade-clip {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #vignette {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 78% 62% at 50% 46%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.72) 100%),
+          linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.62) 100%);
+      }
+      #tint {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(122, 154, 1, 0.08), rgba(212, 175, 55, 0.08));
+        mix-blend-mode: soft-light;
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 45%, rgba(255, 250, 225, 0.9), rgba(212, 175, 55, 0.35) 55%, rgba(0, 0, 0, 0) 80%);
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+      #logo-clip,
+      #captions-clip {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #logo-wrap {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 340px;
+        height: var(--logo-h);
+      }
+      #logo {
+        position: absolute;
+        inset: 0;
+        width: 340px;
+        height: var(--logo-h);
+        display: block;
+      }
+      /* Referans altyazı stili: Calibri Bold, açık sarı, kalın siyah kontur + gölge.
+         720p'de 50pt / alt boşluk 300px -> 1080x1920'de 75px / 450px */
+      .chunk {
+        position: absolute;
+        left: 60px;
+        right: 60px;
+        bottom: 450px;
+        height: 100px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: center;
+        align-content: flex-end;
+        gap: 0 18px;
+        opacity: 0;
+        transform-origin: 50% 80%;
+      }
+      /* Yer ve boyut sabit (dikey 1080x1920, 75px, alttan 450px). Sadece renk, yazı şekli (stil) ve animasyon
+         değişir: build_video.py --renk / --kontur / --stil / --anim -> data.js (D.caption) -> CSS değişkenleri */
+      #captions-clip {
+        --cap-fill: #f8d85a;
+        --cap-stroke: #000;
+        --cap-box: rgba(0, 0, 0, 0.78);
+      }
+      .w {
+        display: inline-block;
+        font-family: "CaptionCalibri", sans-serif;
+        font-weight: 700;
+        font-size: 75px;
+        line-height: 1.1;
+        color: var(--cap-fill);
+        -webkit-text-stroke: 10px var(--cap-stroke);
+        paint-order: stroke fill;
+        text-shadow: 0 5px 8px rgba(0, 0, 0, 0.65);
+      }
+      /* stil: kutu - her kelime koyu, yuvarlak köşeli etiket içinde */
+      .style-box .chunk { gap: 0 12px; }
+      .style-box .w {
+        -webkit-text-stroke: 0;
+        text-shadow: none;
+        background: var(--cap-box);
+        padding: 4px 18px 8px;
+        border-radius: 14px;
+      }
+      /* stil: gölge - kontur yok, yumuşak koyu gölge */
+      .style-shadow .w {
+        -webkit-text-stroke: 0;
+        text-shadow: 0 4px 0 var(--cap-stroke), 0 8px 22px rgba(0, 0, 0, 0.9);
+      }
+      /* stil: çift kontur - iç kontur + dışta ince renkli halka */
+      .style-double .w {
+        -webkit-text-stroke: 9px var(--cap-stroke);
+        text-shadow: 0 0 0 var(--cap-fill), 3px 3px 0 var(--cap-stroke), -3px -3px 0 var(--cap-stroke),
+          3px -3px 0 var(--cap-stroke), -3px 3px 0 var(--cap-stroke), 0 8px 14px rgba(0, 0, 0, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-width="1080" data-height="1920" data-fps="30" data-duration="142.524">
+      <div id="bg-clip" class="clip" data-start="0" data-duration="142.524" data-track-index="0"></div>
+      <!--VIDEOS-START-->
+      <!--VIDEOS-END-->
+      <div id="fx-clip" class="clip" data-start="0" data-duration="142.524" data-track-index="10">
+        <canvas id="fx" width="1080" height="1920"></canvas>
+      </div>
+      <div id="grade-clip" class="clip" data-start="0" data-duration="142.524" data-track-index="11">
+        <div id="tint"></div>
+        <div id="vignette"></div>
+        <div id="flash"></div>
+      </div>
+      <div id="captions-clip" class="clip" data-start="0" data-duration="142.524" data-track-index="12"></div>
+      <div id="logo-clip" class="clip" data-start="0" data-duration="142.524" data-track-index="13">
+        <div id="logo-wrap">
+          <img id="logo" src="assets/logo.png" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const D = window.ZEB;
+        const DUR = D.duration;
+        const W = 1080, H = 1920;
+        const SEG = D.segments;
+        const TR = D.transition;
+
+        function rng(seed) {
+          return function () {
+            seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+            let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        const TAU = Math.PI * 2;
+        function glow(ctx, x, y, r, color, a) {
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, color.replace("A", a));
+          g.addColorStop(1, color.replace("A", 0));
+          ctx.fillStyle = g;
+          ctx.fillRect(x - r, y - r, r * 2, r * 2);
+        }
+
+        // ---------- efekt katmanı: ışık süzmesi, toz zerreleri, film greni ----------
+        const fx = document.getElementById("fx");
+        const ctx = fx.getContext("2d");
+        const MOTES = (() => { const r = rng(19), a = []; for (let i = 0; i < 70; i++) a.push({ x: r() * W, y: r() * H, s: 0.3 + r(), z: r(), ph: r() * TAU }); return a; })();
+        const LEAK = ["rgba(255,140,40,A)", "rgba(184,224,74,A)", "rgba(255,190,90,A)", "rgba(212,175,55,A)", "rgba(184,224,74,A)", "rgba(255,240,200,A)", "rgba(184,224,74,A)"];
+        // kesme anları: sahne geçişleri güçlü, sahne içi kesmeler hafif
+        const CUTS = SEG.slice(1).map((s) => ({ t: s.start, scene: s.scene, strong: s.first }));
+
+        function drawFx(t) {
+          ctx.clearRect(0, 0, W, H);
+          ctx.globalCompositeOperation = "lighter";
+          // kozmik toz zerreleri (yavaş süzülür)
+          for (const m of MOTES) {
+            const y = (m.y - t * 18 * m.s + H * 4) % H;
+            const x = m.x + Math.sin(t * 0.5 + m.ph) * 24;
+            const a = 0.12 + 0.2 * (0.5 + 0.5 * Math.sin(t * 1.7 + m.ph));
+            glow(ctx, x, y, 3 + m.z * 7, "rgba(220,240,170,A)", a);
+          }
+          // ışık süzmesi
+          for (const c of CUTS) {
+            const span = c.strong ? TR * 1.1 : TR * 0.7;
+            const e = Math.abs(t - c.t) / span;
+            if (e >= 1) continue;
+            const a = Math.pow(1 - e, 2) * (c.strong ? 1 : 0.55);
+            const drift = (t - c.t) * 600;
+            glow(ctx, W * 0.82 + drift, H * 0.22, 1250, LEAK[c.scene - 1], 0.6 * a);
+            glow(ctx, W * 0.12 - drift * 0.6, H * 0.78, 950, "rgba(212,175,55,A)", 0.4 * a);
+          }
+          ctx.globalCompositeOperation = "overlay";
+          const gr = rng(Math.floor(t * 30) + 7);
+          for (let n = 0; n < 1100; n++) { ctx.fillStyle = gr() > 0.5 ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)"; ctx.fillRect(gr() * W, gr() * H, 2, 2); }
+          ctx.globalCompositeOperation = "source-over";
+        }
+
+        // ---------- altyazı DOM ----------
+        const capClip = document.getElementById("captions-clip");
+        const CAP = Object.assign({ fill: "#f8d85a", stroke: "#000000", style: "outline", anim: "pop" }, D.caption || {});
+        capClip.style.setProperty("--cap-fill", CAP.fill);
+        capClip.style.setProperty("--cap-stroke", CAP.stroke);
+        capClip.classList.add("style-" + CAP.style);
+        const chunkEls = D.chunks.map((c, ci) => {
+          const el = document.createElement("div");
+          el.className = "chunk"; el.id = "chunk-" + ci;
+          c.words.forEach((wi) => {
+            const w = D.words[wi];
+            const sp = document.createElement("span");
+            sp.className = "w" + (w.key ? " key" : "");
+            sp.id = "w-" + wi;
+            sp.textContent = w.text;
+            el.appendChild(sp);
+          });
+          capClip.appendChild(el);
+          return el;
+        });
+
+        // ---------- zaman çizelgesi ----------
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+        const proxy = { t: 0 };
+        tl.to(proxy, { t: DUR, duration: DUR, ease: "none", onUpdate: () => drawFx(proxy.t) }, 0);
+        drawFx(0);
+
+        // video segmentleri: geçişte opaklık + pull-out, sahne boyu yavaş push-in, çıkışta hızlanan zoom
+        SEG.forEach((s, i) => {
+          const id = "#seg-" + i;
+          const a = s.vstart, b = s.vend;
+          const len = b - a;
+          if (i === 0) tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out" }, 0);
+          else tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: TR, ease: "sine.inOut" }, a);
+          // sahne boyunca tek, kesintisiz sinematik kamera hareketi (dolly + yanal kayma).
+          // Ani zoom/punch-in yok; her sahne farklı yönde süzülür. Kayma xPercent ile (sarsıntı x/y'yi kullanır).
+          const dir = i % 2 === 0 ? 1 : -1;
+          const rise = i % 3 === 1 ? -1 : 1;
+          tl.fromTo(id, { scale: 1.06, xPercent: -1.2 * dir, yPercent: 0.5 * rise },
+            { scale: 1.13, xPercent: 1.2 * dir, yPercent: -0.5 * rise, duration: len, ease: "sine.inOut" }, a);
+        });
+
+        // kapanış: son kareye doğru karartma
+        tl.to("#seg-" + (SEG.length - 1), { opacity: 0, duration: 1.4, ease: "power1.in" }, DUR - 1.5);
+
+        // sarsıntı (impact shake) + parlama
+        (D.impacts || []).forEach((im) => {
+          const seg = SEG.findIndex((s) => im.t >= s.vstart && im.t < s.vend);
+          if (seg < 0) return;
+          const id = "#seg-" + seg;
+          const steps = [[14, -10], [-12, 9], [9, 7], [-6, -5], [3, 2], [0, 0]];
+          steps.forEach((p, k) => tl.to(id, { x: p[0] * im.power, y: p[1] * im.power, duration: 0.05, ease: "none" }, im.t + k * 0.05));
+          tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.45 * im.power, duration: 0.08, ease: "none" }, im.t);
+          tl.to("#flash", { opacity: 0, duration: 0.6, ease: "power2.out" }, im.t + 0.08);
+        });
+
+        // altyazılar: blok konuşmayla gelir, sonraki blok gelince kaybolur. Giriş animasyonu CAP.anim'e göre:
+        //   pop      - blok hafif büyüyerek belirir (varsayılan)
+        //   hop      - blok aşağıdan zıplayarak gelir
+        //   word-hop - her kelime kendi söylendiği anda tek tek zıplar
+        //   bounce   - blok yukarıdan düşüp seker
+        //   wave     - kelimeler sırayla dalga gibi yukarı-aşağı hoplar
+        D.chunks.forEach((c, ci) => {
+          const el = chunkEls[ci];
+          const words = c.words.map((wi) => "#w-" + wi);
+          const next = D.chunks[ci + 1];
+          const end = next ? Math.min(next.start, c.end + 0.5) : c.end + 0.8;
+          const t0 = c.start - 0.03;
+          if (CAP.anim === "hop") {
+            tl.fromTo(el, { opacity: 0, y: 46, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(3)" }, t0);
+          } else if (CAP.anim === "word-hop") {
+            tl.set(el, { opacity: 1 }, t0);
+            c.words.forEach((wi) => {
+              const ws = Math.max(t0, D.words[wi].start - 0.03);
+              tl.fromTo("#w-" + wi, { opacity: 0, y: 34, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "back.out(3.2)" }, ws);
+            });
+          } else if (CAP.anim === "bounce") {
+            tl.fromTo(el, { opacity: 0, y: -70 }, { opacity: 1, y: 0, duration: 0.42, ease: "bounce.out" }, t0);
+          } else if (CAP.anim === "wave") {
+            tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, t0);
+            words.forEach((w, k) => {
+              tl.fromTo(w, { y: 0 }, { y: -20, duration: 0.12, ease: "sine.out", yoyo: true, repeat: 1 }, t0 + k * 0.07);
+            });
+          } else {
+            tl.fromTo(el, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.12, ease: "back.out(2.5)" }, t0);
+          }
+          tl.to(el, { opacity: 0, duration: 0.06, ease: "none" }, Math.max(c.start + 0.1, end - 0.06));
+        });
+
+        // logo = kayan filigran (kopyalanmaya karşı): yüklendiği gibi, tam opak (soluk değil,
+        // efekt yok). Video boyunca köşeden köşeye yavaşça kayar: sol alt -> sağ üst -> sağ alt -> sol üst -> ...
+        const LOGO_SCALE = 0.76, CORNER_LEGS = 6;  // video süresi bu kadar ayağa bölünür (2 dk'da ~24 sn/ayak)
+        const lw = 340 * LOGO_SCALE, lh = document.getElementById("logo-wrap").offsetHeight * LOGO_SCALE;
+        const X0 = 40, X1 = 1080 - lw - 40, Y0 = 140, Y1 = 1370 - lh;  // altyazı bandının üstünde kalır
+        const corners = [[X0, Y1], [X1, Y0], [X1, Y1], [X0, Y0]];
+        const leg = DUR / CORNER_LEGS;
+        tl.set("#logo-wrap", { x: X0, y: Y1, scale: LOGO_SCALE, transformOrigin: "0 0", opacity: 1 }, 0);
+        for (let k = 0; k < CORNER_LEGS; k++) {
+          const [nx, ny] = corners[(k + 1) % corners.length];
+          tl.to("#logo-wrap", { x: nx, y: ny, duration: leg, ease: "sine.inOut" }, k * leg);
+        }
+
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

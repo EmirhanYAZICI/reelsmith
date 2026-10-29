@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+
+# Üretilen dosyalar (projeye kopyalanınca oluşur)
+template/artifacts/
+template/assets/
+template/renders/
+template/composition_video/data.js
+template/composition_video/assets/
+template/composition_video/.hyperframes/
+
+# Medya ve fontlar (lisans / boyut)
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.ttf
+*.otf
+
+# Sistem
+.DS_Store
+Thumbs.db
