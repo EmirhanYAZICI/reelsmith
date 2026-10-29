@@ -12,8 +12,10 @@ import unicodedata
 from difflib import SequenceMatcher
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from common import scene_texts  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT_TXT = Path(sys.argv[1])
 TRANSCRIPT = ROOT / "artifacts" / "voiceover_transcript.json"
 OUT = ROOT / "artifacts" / "timeline.json"
 
@@ -28,24 +30,19 @@ def norm(w: str) -> str:
     return re.sub(r"[^\w]", "", w)
 
 
-def scene_texts(path: Path) -> list[str]:
-    raw = path.read_text(encoding="utf-8")
-    found = re.findall(r'Metin karşılığı:\s*"(.+?)"\)', raw, flags=re.S)
-    if not found:
-        raise SystemExit("Senaryoda 'Metin karşılığı: \"...\")' satırı bulunamadı")
-    return [" ".join(t.split()) for t in found]
-
-
-def main() -> None:
-    scenes = scene_texts(SCRIPT_TXT)
+def build_timeline(scenes: list[str], hyp: list[dict], duration: float | None = None) -> tuple[dict, int]:
+    """Sahne metinleri + Whisper kelimeleri -> (timeline, birebir eşleşen kelime sayısı).
+    Yazım her zaman sahne metninden gelir; Whisper sadece zamanı verir. Whisper'ın yanlış duyduğu
+    kelime aynı yerdeyse zamanını alır, eşleşmeyen kelimeler komşu kelimelerin zamanıyla doldurulur."""
     n_sc = len(scenes)
+    if not n_sc:
+        raise ValueError("sahne metni boş / no scene text")
+    if not hyp:
+        raise ValueError("Whisper hiç kelime bulmadı / transcript has no words")
     ref = []  # (word, scene_index)
     for si, text in enumerate(scenes):
         for w in text.split():
             ref.append((w, si))
-
-    data = json.loads(TRANSCRIPT.read_text(encoding="utf-8"))
-    hyp = [w for w in data["word_timestamps"] if w.get("word", "").strip()]
 
     a = [norm(w) for w, _ in ref]
     b = [norm(w["word"]) for w in hyp]
@@ -77,7 +74,7 @@ def main() -> None:
 
     # Sahne sınırları: sahnenin ilk kelimesi başladığında sahne değişir
     starts = [next(w["start"] for w in words if w["scene"] == si) for si in range(n_sc)]
-    total = float(data.get("duration") or words[-1]["end"] + 2.0)
+    total = float(duration or words[-1]["end"] + 2.0)
     scene_list = []
     for si in range(n_sc):
         s = 0.0 if si == 0 else round(starts[si] - 0.25, 3)
@@ -107,10 +104,22 @@ def main() -> None:
             merged.append(c)
     chunk_list = [{"start": words[c[0]]["start"], "end": words[c[-1]]["end"], "words": c} for c in merged]
 
-    OUT.write_text(json.dumps({"duration": total, "scenes": scene_list, "words": words,
-                               "chunks": chunk_list}, ensure_ascii=False, indent=1), encoding="utf-8")
+    matched = sum(op[2] - op[1] for op in sm.get_opcodes() if op[0] == "equal")
+    return {"duration": total, "scenes": scene_list, "words": words, "chunks": chunk_list}, matched
 
-    matched = sum(1 for op in sm.get_opcodes() if op[0] == "equal" for _ in range(op[2] - op[1]))
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        raise SystemExit("Kullanım: align.py <sahne metni.txt>")
+    scenes = scene_texts(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    data = json.loads(TRANSCRIPT.read_text(encoding="utf-8"))
+    hyp = [w for w in data["word_timestamps"] if w.get("word", "").strip()]
+    try:
+        tl, matched = build_timeline(scenes, hyp, data.get("duration"))
+    except ValueError as e:
+        raise SystemExit(str(e)) from None
+    OUT.write_text(json.dumps(tl, ensure_ascii=False, indent=1), encoding="utf-8")
+    ref, scene_list, chunk_list = tl["words"], tl["scenes"], tl["chunks"]
     print(f"kelime: {len(ref)} senaryo / {len(hyp)} whisper, birebir eşleşme: {matched}")
     for s in scene_list:
         print(f"Sahne {s['index']}: {s['start']:.2f} - {s['end']:.2f}  ({s['end'] - s['start']:.1f} sn)")

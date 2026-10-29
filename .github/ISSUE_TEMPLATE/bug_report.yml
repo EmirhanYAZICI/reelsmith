@@ -1,0 +1,68 @@
+name: Bug report / Hata bildirimi
+description: Something went wrong while installing or making a Reel / Kurulumda ya da Reels üretirken bir sorun çıktı
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please run the preflight check first and paste its output below.
+        Bildirdiğin için teşekkürler. Önce ön kontrolü çalıştır ve çıktısını aşağıya yapıştır.
+
+        ```
+        python skills/reelsmith/template/scripts/check.py --src=<your folder>
+        ```
+        Do not paste API keys, private file paths you do not want public, or client media.
+        API anahtarı, paylaşmak istemediğin dosya yolları ya da müşteri videosu yapıştırma.
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent / Ajan
+      options: [Claude Code, OpenAI Codex CLI, Cursor, OpenCode, Google Antigravity, Other / Diğer]
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system / İşletim sistemi
+      options: [Windows 11, Windows 10, macOS, Linux]
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where did it fail? / Nerede hata verdi?
+      options:
+        - Install / Kurulum
+        - Preflight check / Ön kontrol
+        - Whisper transcription / Whisper
+        - Scene alignment / Sahne eşleştirme
+        - Clip preparation / Klip hazırlama
+        - HyperFrames render
+        - Audio mix / Ses miksajı
+        - Final video looks wrong / Video yanlış görünüyor
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: Preflight output / Ön kontrol çıktısı
+      description: Output of check.py
+      render: text
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Ne oldu?
+      description: What you asked the agent, what you expected, what you got. / Ajana ne yazdın, ne bekledin, ne oldu.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Error message / Hata mesajı
+      description: The last lines of the error. / Hatanın son satırları.
+      render: text
+  - type: input
+    id: versions
+    attributes:
+      label: Versions / Sürümler
+      placeholder: "Python 3.12, ffmpeg 8.1, HyperFrames 0.8.216, Reelsmith 1.3.0"

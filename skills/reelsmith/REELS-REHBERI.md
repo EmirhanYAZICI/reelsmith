@@ -28,12 +28,12 @@ Bir klasör, örnek: `~/Desktop/<proje klasörü>/`. Yer değişebilir, kullanı
 | Dosya | Açıklama |
 |---|---|
 | Seslendirme (`.mp3` / `.wav`) | Adında "seslendirme" geçer. Tüm videonun süresini bu belirler. |
-| Sahne videoları | Kullanıcı Gemini (Veo) ile üretir. Her biri ~10 sn, dikey, **kendi müziği/efekti var**. Adları `1sahne.mp4`, `2sahne.mp4` … gibi. Yazım hatası olabilir (`4sahen.mp4`), script bunu tanır. Bir sahneye 2 video da konabilir (`3sahne_b.mp4`). |
-| Sahne metni (`.txt` / `.md`) | Her sahne için `Metin karşılığı: "…")` satırı. Bu metin seslendirmede okunan yazıdır ve altyazının doğru yazımı buradan gelir. |
-| Logo (`.png`, şeffaf) | Firmanın logosu. Adında "logo" geçen png; yoksa klasördeki tek png. Birden fazla görsel varsa hangisi olduğunu sor. Script bunu otomatik alır, `assets/logo.png` yapar, yüksekliği logonun oranına göre ayarlar ve **hareketli** gösterir (bkz. Logo bölümü). Farklı adlıysa `--logo=<dosya>` ver. Logo yoksa script durur ve logo ister. |
+| Sahne videoları | Kullanıcı Gemini (Veo) ile üretir. Her biri ~10 sn, dikey, **kendi müziği/efekti var**. Adları `1sahne.mp4` ya da `scene1.mp4`, `2sahne.mp4` … gibi. Yazım hatası olabilir (`4sahen.mp4`), script bunu tanır. Bir sahneye 2 video da konabilir (`3sahne_b.mp4`). |
+| Sahne metni (`.txt` / `.md`) | Seslendirmede okunan yazı; altyazının doğru yazımı buradan gelir. Üç biçim olur (ilk bulunan kazanır): her sahne için `Metin karşılığı: "…")` satırı; ya da `Metin: "…"` / `Text: "…"` satırları; ya da etiket yoksa boş satırla ayrılmış her paragraf bir sahne (`#` ile başlayan satırlar atlanır). |
+| Logo (`.png`, şeffaf) | Firmanın logosu. Adında "logo" geçen png; yoksa klasördeki tek png. Birden fazla görsel varsa hangisi olduğunu sor. Script bunu otomatik alır, `assets/logo.png` yapar, yüksekliği logonun oranına göre ayarlar ve varsayılan olarak **hareketli** gösterir (bkz. Logo bölümü). Farklı adlıysa `--logo=<dosya>` ver. Logo yoksa script durur ve logo ister. |
 
 **Sahne sayısı sabit değil.** Kullanıcı kaç sahne verirse (5, 7, 10…) o kadar sahne kurulur:
-- Sahne metnindeki her `Metin karşılığı: "…")` = 1 sahne.
+- Sahne metnindeki her `Metin karşılığı: "…")` (ya da `Text:` satırı / paragraf) = 1 sahne.
 - Her sahneye numarası eşleşen video(lar) konur (`1sahne` → 1. sahne metni).
 - Video sayısı ile sahne metni sayısı eşit olmalı. Eksik varsa script "Eksik sahne videoları: [n]" der, kullanıcıya sor.
 - Her videonun süresi, Whisper'ın bulduğu o sahnenin konuşma süresine göre yavaşlatılarak ayarlanır.
@@ -76,6 +76,12 @@ export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
 SRC="<kullanıcının verdiği klasör>"       # her zaman --src ile ver
 ```
 
+**0) Ön kontrol** (uzun işlerden önce, her zaman)
+```bash
+$PY scripts/check.py --src="$SRC" [--script=<metin>] [--vo=<ses>] [--logo=<logo>] [altyazı/logo seçenekleri]
+```
+Araçları (Python paketleri, ffmpeg, HyperFrames), sahne metnini, her klibi (okunuyor mu, dikey mi), seslendirmeyi, logoyu ve fontu kontrol eder. Seçenekleri de doğrular. Her satır OK / WARN / FAIL. FAIL varsa durup kullanıcıya düz cümleyle söyle; WARN render'ı durdurmaz ama kullanıcıya bildir. Hiçbir dosyayı değiştirmez.
+
 **1) Whisper ile döküm**
 ```bash
 $PY scripts/transcribe.py "$SRC/<seslendirme>.mp3" artifacts/voiceover_transcript.json "Özel isimler, virgülle"
@@ -96,7 +102,9 @@ $PY scripts/build_video.py --src="$SRC" --name=<konu>_reels_final.mp4 --skip-pre
 ```
 - `--src=` kaynak klasör (zorunlu). Seslendirme ve logo otomatik bulunur. Bulamazsa `--vo=<dosya>` / `--logo=<dosya>` ver.
 - Font: Calibri Bold Windows'tan (`C:\Windows\Fonts\calibrib.ttf`) kopyalanır. Lisans gereği repoda yok. Başka sistemde `--font=<yol>`.
-- `--skip-prep` hazırlanmış klipleri tekrar işlemez. Sadece kompozisyon değişince kullan.
+- `--skip-prep` hazırlanmış klipleri tekrar işlemez. Sadece kompozisyon değişince ya da render yarıda kesilince kullan (klipler hazırsa kaldığı yerden devam eder).
+- Logo seçenekleri: `--logo-mode`, `--logo-pos`, `--logo-size`, `--logo-moves` (bkz. Logo bölümü). İki komutta da aynı verilmeli.
+- Bir araç yoksa ya da ffmpeg hata verirse script hangi adımda ve hangi dosyada olduğunu yazıp durur (Python izi değil).
 - Uzun sürer (klip hazırlığı + render ~15-25 dk). Arka planda çalıştır.
 
 **4) Kontrol**
@@ -140,16 +148,28 @@ Son video iki yere kopyalanır (script otomatik yapar):
 - **Varsayılan** (örnek proje Zebercet'te kullanılan): sarı `#F8D85A` + 10px siyah kontur + gölge (`outline`) + `pop` (opacity 0→1, scale 0.88→1, `back.out`). Sonraki blok gelince kaybolur.
 - Yazım her zaman sahne metnindeki gibi olur (Whisper'ın yazımı değil).
 
-### Logo (firmanın logosu) — HER ZAMAN HAREKETLİ
-Kayan filigran. Amaç videonun çalınmasını, logonun kırpılıp atılmasını zorlaştırmak.
+### Logo (firmanın logosu) — varsayılan HAREKETLİ
+Varsayılan kayan filigran. Amaç videonun çalınmasını, logonun kırpılıp atılmasını zorlaştırmak.
+Kullanıcı isterse değiştirilebilir (kullanıcı söylemedikçe varsayılanı kullan):
+
+| Seçenek | Varsayılan | Değerler |
+|---|---|---|
+| `--logo-mode` | `move` | `move` (köşeden köşeye kayar), `corner` (tek köşede sabit), `ends` (açılış 0-2.6 sn ve son 2.8 sn ortada büyük). `ends` birleşir: `move,ends`, `corner,ends` (büyük logo görünürken köşedeki gizlenir) |
+| `--logo-pos` | `bottom-left` | `bottom-left`, `bottom-right`, `top-left`, `top-right` |
+| `--logo-size` | `258` | px genişlik, 80-700 |
+| `--logo-moves` | `6` | `move` için video boyunca kaç ayak (az = daha yavaş) |
+
+Kullanıcı cümleleri: "logo sabit dursun / sağ üstte" → `--logo-mode=corner --logo-pos=top-right`; "başta ve sonda büyük logo" → `ends` ekle; "logo daha küçük" → `--logo-size=200`; "daha yavaş gezsin" → `--logo-moves=4`.
+
+Varsayılan (`move`) davranış:
 - Kullanıcının verdiği logo **yüklendiği gibi** kullanılır: rengi neyse o, **tam opak**. Soluk/saydam değil, gölge, parlama ya da ışık efekti yok.
 - Boyut ~**260 px** genişlik (340 × 0.76, yükseklik orana göre).
 - Başlangıç: **sol alt** köşe (altyazının hemen üstü), ilk karede görünür.
 - Hareket: video boyunca **köşeden köşeye yavaşça** kayar, hiç durmaz. Sıra: sol alt → sağ üst → sağ alt → sol üst → sol alt …
   - Video süresi 6 ayağa bölünür. 2 dk'lık videoda her ayak ~24 sn, ease `sine.inOut`.
   - Köşeler: x 40 / 1080-genişlik-40, y 140 / altyazı bandının üstü (1370 - logo yüksekliği). Altyazının üstüne binmez.
-- Ayarlar `composition_video/index.html` içinde: `LOGO_SCALE`, `CORNER_LEGS`.
-- YAPMA: üst ortada sabit logo, hızlı zıplama, soluklaştırma, renk değiştirme, efekt. 
+- Ayarlar `--logo-*` seçenekleriyle gelir (`data.js` içinde `logo`), şablon `composition_video/index.html` bunları okur.
+- YAPMA (hiçbir modda): soluklaştırma, renk değiştirme, gölge/parlama efekti, hızlı zıplama.
 
 ### Ses
 - Seslendirme: loudnorm **-14 LUFS**, her zaman en önde.
@@ -165,6 +185,8 @@ Kayan filigran. Amaç videonun çalınmasını, logonun kırpılıp atılmasın�
 
 | Dosya | Görev |
 |---|---|
+| `scripts/check.py` | Ön kontrol: araçlar, sahne metni, klipler, seslendirme, logo, font, seçenekler |
+| `scripts/common.py` | Ortak yardımcılar: sahne adı tanıma, sahne metni okuma, altyazı/logo seçenekleri |
 | `scripts/transcribe.py` | Whisper → `artifacts/voiceover_transcript.json` |
 | `scripts/align.py` | Döküm + sahne metni → `artifacts/timeline.json` (sahneler, kelimeler, altyazı blokları) |
 | `scripts/build.py` | SFX üretimi, ducking ifadesi, `timeline.json` yükleme |
@@ -186,6 +208,8 @@ HyperFrames kuralları (bozma):
 
 | Sorun | Çözüm |
 |---|---|
+| Neyin eksik olduğu belli değil | Önce `scripts/check.py --src=<klasör>` çalıştır. FAIL satırları sorunu ve çözümü yazar. |
+| Render yarıda kesildi | Klipler hazırsa `build_video.py ... --skip-prep` ile devam et; klip hazırlığı tekrarlanmaz. |
 | Whisper modeli indirmede takılıyor | `HF_HUB_DISABLE_XET=1` ile `small` modeli kullan. |
 | `transcriber` PyAV hatası | `scripts/transcribe.py` kullan (ffmpeg ile çözer). |
 | "Eksik sahne videoları: [n]" | Dosya adında sahne numarası yok. Kullanıcıya sor, adı değiştirmeden `sahneler\` alt klasörüne doğru adla kopya koy. |

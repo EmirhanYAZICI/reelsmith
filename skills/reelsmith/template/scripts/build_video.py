@@ -24,6 +24,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 import build  # noqa: E402  (SFX + miks fonksiyonları)
+from common import (OptionError, caption_options, group_clips, logo_options,  # noqa: E402
+                    plan_segments)
 
 COMP = ROOT / "composition_video"
 CLIPS = COMP / "assets" / "clips"
@@ -35,6 +37,8 @@ def _opt(name: str, default: str = "") -> str:
 if not _opt("src"):
     raise SystemExit("Kaynak klasörü ver: --src=<klasör>  (seslendirme, sahne videoları, logo)")
 SRC_DIR = Path(_opt("src"))
+if not SRC_DIR.is_dir():
+    raise SystemExit(f"Kaynak klasör yok / source folder not found: {SRC_DIR}")
 # Seslendirme: --vo= verilmezse adında "seslendirme/voice/vo" geçen ses dosyası, yoksa ilk ses dosyası
 _audio = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() in {".mp3", ".wav", ".m4a"})
 VO = Path(_opt("vo")) if _opt("vo") else next(
@@ -46,103 +50,52 @@ FINAL_NAME = _opt("name", "reels_final.mp4")
 _pngs = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() == ".png")
 LOGO = Path(_opt("logo")) if _opt("logo") else next(
     (p for p in _pngs if re.search(r"logo", p.stem.lower())), _pngs[0] if len(_pngs) == 1 else None)
-LOGO_W = 340  # ekrandaki logo genişliği (px)
+LOGO_W = 340  # logo-wrap taban genişliği (px); ekrandaki boyutu --logo-size belirler
 # Altyazı fontu Calibri Bold: lisans gereği repoda yok, Windows'tan (ya da --font=) kopyalanır
 FONT = Path(_opt("font", r"C:\Windows\Fonts\calibrib.ttf"))
 # Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. CAPTION-STYLES.md)
-# Seçenekler: --caption-color, --caption-outline, --caption-style, --caption-anim
-# (eski Türkçe adlar da çalışır: --renk, --kontur, --stil, --anim)
-COLORS = {"yellow": "#F8D85A", "white": "#FFFFFF", "green": "#B8E04A", "gold": "#E8C15A", "orange": "#FFA53D",
-          "red": "#FF5A5A", "pink": "#FF7AC6", "blue": "#5AC8FA", "purple": "#B79CFF", "black": "#111111"}
-COLOR_ALIASES = {"sari": "yellow", "beyaz": "white", "yesil": "green", "altin": "gold", "turuncu": "orange",
-                 "kirmizi": "red", "pembe": "pink", "mavi": "blue", "mor": "purple", "siyah": "black"}
-STYLES = ("outline", "box", "shadow", "double")
-ANIMS = ("pop", "hop", "word-hop", "bounce", "wave")
-
-
-def _color(v: str) -> str:
-    v = v.lower()
-    for a, b in zip("ışğüöç", "isguoc"):
-        v = v.replace(a, b)
-    v = COLOR_ALIASES.get(v, v)
-    if v in COLORS:
-        return COLORS[v]
-    if re.fullmatch(r"#?[0-9a-f]{6}", v):
-        return "#" + v.lstrip("#").upper()
-    raise SystemExit(f"Unknown color / bilinmeyen renk: {v}. Options: {', '.join(COLORS)} or #RRGGBB")
-
-
-def _cap(name: str, old: str, default: str) -> str:
-    return _opt(f"caption-{name}") or _opt(old) or default
-
-
-CAPTION = {"fill": _color(_cap("color", "renk", "yellow")), "stroke": _color(_cap("outline", "kontur", "#000000")),
-           "style": _cap("style", "stil", "outline"), "anim": _cap("anim", "anim", "pop")}
-if CAPTION["style"] not in STYLES:
-    raise SystemExit(f"Unknown style / bilinmeyen stil: {CAPTION['style']}. Options: {', '.join(STYLES)}")
-if CAPTION["anim"] not in ANIMS:
-    raise SystemExit(f"Unknown animation / bilinmeyen animasyon: {CAPTION['anim']}. Options: {', '.join(ANIMS)}")
+# Logo: --logo-mode=move|corner|ends, --logo-pos, --logo-size, --logo-moves (bkz. REELS-REHBERI.md)
+try:
+    CAPTION = caption_options(_opt)
+    LOGO_OPT = logo_options(_opt)
+except OptionError as e:
+    raise SystemExit(str(e)) from None
 TR = 0.8  # geçiş süresi
 TL = build.TL
 FPS = 30
 N_SCENES = len(TL["scenes"])
 
 
+def sh(cmd: list[str], what: str) -> str:
+    """Komutu çalıştırır; araç yoksa ya da hata verirse ne olduğunu anlaşılır yazıp durur."""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                              check=True).stdout
+    except FileNotFoundError:
+        raise SystemExit(f"{cmd[0]} bulunamadı / not found. Kur ve PATH'e ekle, sonra scripts/check.py ile kontrol et.")
+    except subprocess.CalledProcessError as e:
+        tail = "\n".join((e.stderr or "").strip().splitlines()[-6:])
+        raise SystemExit(f"{what} başarısız / failed ({cmd[0]} çıkış kodu {e.returncode}):\n{tail}")
+
+
 def probe_duration(p: Path) -> float:
-    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)],
-                         capture_output=True, text=True, check=True).stdout
-    return float(out.strip())
-
-
-ORDINALS = {"birinci": 1, "ilk": 1, "ikinci": 2, "üçüncü": 3, "ucuncu": 3, "dördüncü": 4, "dorduncu": 4,
-            "beşinci": 5, "besinci": 5, "altıncı": 6, "altinci": 6, "yedinci": 7,
-            "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7}
-
-
-def scene_number(stem: str) -> int | None:
-    """'sahne 1', '1.sahne', 'ikinci sahne', 'scene1', 'scene_2b', 'third scene' -> sahne numarası."""
-    s = re.sub(r"scene|sah[en]{2}|shane|sahn", "sahne", stem.lower())  # 'sahen' gibi yazım hataları
-    if "sahne" not in s:
-        return None
-    m = re.search(r"sahne\s*[._-]?\s*(\d+)", s) or re.search(r"(\d+)\s*[._-]?\s*\.?\s*sahne", s)
-    if m:
-        n = int(m.group(1))
-        return n if 1 <= n <= N_SCENES else None
-    for word, n in ORDINALS.items():
-        if word in s:
-            return n
-    return None
+    out = sh(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)],
+             f"süre okuma: {p.name}")
+    try:
+        return float(out.strip())
+    except ValueError:
+        raise SystemExit(f"Video okunamadı / unreadable (bozuk olabilir): {p}") from None
 
 
 def find_clips(folder: Path) -> dict[int, list[Path]]:
-    found: dict[int, list[Path]] = {}
-    for p in sorted(folder.iterdir()):
-        if p.suffix.lower() not in {".mp4", ".mov", ".webm", ".mkv"}:
-            continue
-        n = scene_number(p.stem)
-        if n:
-            found.setdefault(n, []).append(p)
-    missing = [n for n in range(1, N_SCENES + 1) if n not in found]
+    found, missing = group_clips(folder, N_SCENES)
     if missing:
-        raise SystemExit(f"Eksik sahne videoları: {missing}  (klasör: {folder})")
+        raise SystemExit(f"Eksik sahne videoları / missing scene clips: {missing}  (klasör: {folder})")
     return found
 
 
-def plan_segments(clips: dict[int, list[Path]]) -> list[dict]:
-    dur = TL["duration"]
-    segs = []
-    for sc in TL["scenes"]:
-        n = sc["index"]
-        files = clips[n]
-        a, b = sc["start"], sc["end"]
-        step = (b - a) / len(files)
-        for k, f in enumerate(files):
-            segs.append({"scene": n, "file": str(f), "first": k == 0,
-                         "start": round(a + k * step, 3), "end": round(a + (k + 1) * step, 3)})
-    for i, s in enumerate(segs):
-        s["vstart"] = 0.0 if i == 0 else round(s["start"] - TR / 2, 3)
-        s["vend"] = dur if i == len(segs) - 1 else round(s["end"] + TR / 2, 3)
-    return segs
+def plan(clips: dict[int, list[Path]]) -> list[dict]:
+    return plan_segments(TL["scenes"], clips, TL["duration"], TR)
 
 
 def prep_clip(i: int, s: dict) -> str:
@@ -158,8 +111,8 @@ def prep_clip(i: int, s: dict) -> str:
           "eq=contrast=1.07:saturation=1.12:gamma=0.97,"
           "colorbalance=rs=-0.04:gs=0.02:bs=0.03:rh=0.05:gh=0.03:bh=-0.06,"
           "unsharp=5:5:0.4,format=yuv420p")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-t", f"{need:.3f}", "-vf", vf, "-an",
-                    "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-g", "15", str(out)], check=True)
+    sh(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-t", f"{need:.3f}", "-vf", vf, "-an",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-g", "15", str(out)], f"klip hazırlama: {src.name}")
     return f"seg{i:02d} <- {src.name} ({have:.1f}s, x{f:.2f} yavaş)"
 
 
@@ -176,8 +129,8 @@ def prep_audio(i: int, s: dict) -> str:
     out = CLIPS / f"seg{i:02d}.wav"
     L = s["vend"] - s["vstart"]
     if not has_audio(src):
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", f"anullsrc=r={build.SR}:cl=stereo",
-                        "-t", f"{L:.3f}", str(out)], check=True)
+        sh(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", f"anullsrc=r={build.SR}:cl=stereo",
+            "-t", f"{L:.3f}", str(out)], "sessizlik üretme")
         return f"seg{i:02d}: ses yok, sessizlik"
     have = probe_duration(src)
     xf = min(1.5, have / 4)
@@ -190,8 +143,8 @@ def prep_audio(i: int, s: dict) -> str:
         last = f"[x{k}]"
     fc.append(f"{last}aresample={build.SR},aformat=channel_layouts=stereo,atrim=0:{L:.3f},"
               f"afade=t=in:d=0.4,afade=t=out:st={max(0, L - 0.6):.3f}:d=0.6[out]")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(fc),
-                    "-map", "[out]", "-c:a", "pcm_s16le", str(out)], check=True)
+    sh(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(fc),
+        "-map", "[out]", "-c:a", "pcm_s16le", str(out)], f"klip sesi: {src.name}")
     return f"seg{i:02d}: klip sesi {have:.1f}s -> {L:.1f}s ({n} döngü)"
 
 
@@ -224,8 +177,8 @@ def mix_audio(segs: list[dict]) -> Path:
               f"atrim=0:{dur},alimiter=limit=0.89:level=false[out]")
     script = ROOT / "artifacts" / "mix_filter.txt"
     script.write_text(";\n".join(fc), encoding="utf-8")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex_script", str(script),
-                    "-map", "[out]", "-c:a", "pcm_s16le", str(out)], check=True)
+    sh(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex_script", str(script),
+        "-map", "[out]", "-c:a", "pcm_s16le", str(out)], "ses miksajı")
     return out
 
 
@@ -237,9 +190,8 @@ def use_logo() -> None:
         return
     dst = COMP / "assets" / "logo.png"
     shutil.copy2(LOGO, dst)
-    w, h = map(int, subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
-                                    "stream=width,height", "-of", "csv=p=0", str(dst)],
-                                   capture_output=True, text=True, check=True).stdout.strip().split(","))
+    w, h = map(int, sh(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                        "stream=width,height", "-of", "csv=p=0", str(dst)], f"logo okuma: {LOGO.name}").strip().split(",")[:2])
     html = (COMP / "index.html").read_text(encoding="utf-8")
     html = re.sub(r"--logo-h: \d+px;", f"--logo-h: {round(LOGO_W * h / w)}px;", html)
     (COMP / "index.html").write_text(html, encoding="utf-8")
@@ -270,7 +222,7 @@ def write_composition(segs: list[dict]) -> None:
     html = re.sub(r'(data-composition-id="main"[^>]*data-duration=")[^"]*"',
                   lambda m: m.group(1) + f'{TL["duration"]:.3f}"', html)
     (COMP / "index.html").write_text(html, encoding="utf-8")
-    data = dict(TL, segments=segs, transition=TR, impacts=impacts(), caption=CAPTION)
+    data = dict(TL, segments=segs, transition=TR, impacts=impacts(), caption=CAPTION, logo=LOGO_OPT)
     (COMP / "data.js").write_text("window.ZEB = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
 
 
@@ -281,7 +233,13 @@ def impacts() -> list[dict]:
 
 def run(cmd: list[str], cwd: Path | None = None) -> None:
     print("$", " ".join(cmd[:4]), "...")
-    subprocess.run(cmd, check=True, cwd=cwd, shell=sys.platform == "win32" and cmd[0] == "npx")
+    try:
+        subprocess.run(cmd, check=True, cwd=cwd, shell=sys.platform == "win32" and cmd[0] == "npx")
+    except FileNotFoundError:
+        raise SystemExit(f"{cmd[0]} bulunamadı / not found. scripts/check.py ile eksikleri gör.")
+    except subprocess.CalledProcessError as e:
+        raise SystemExit(f"{' '.join(cmd[:4])} başarısız / failed (çıkış kodu {e.returncode}). Yukarıdaki çıktıya bak. "
+                         "Klipler hazırsa --skip-prep ile kaldığın yerden devam edebilirsin.")
 
 
 def main() -> None:
@@ -289,7 +247,7 @@ def main() -> None:
     folder = Path(args[0]) if args else (SRC_DIR / "sahneler" if (SRC_DIR / "sahneler").is_dir() else SRC_DIR)
     render = "--no-render" not in sys.argv
     clips = find_clips(folder)
-    segs = plan_segments(clips)
+    segs = plan(clips)
     for n in range(1, N_SCENES + 1):
         print(f"Sahne {n}: {[Path(p).name for p in clips[n]]}")
 

@@ -10,13 +10,41 @@
 <img src="https://img.shields.io/badge/HyperFrames-GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=black" alt="HyperFrames"/>
 <img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg"/>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=000000" alt="MIT License"/></a>
+<br/>
+<a href="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml"><img src="https://github.com/EmirhanYAZICI/reelsmith/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
 
 An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.<br/>
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
 
-[Quick start](#quick-start) · [English](#english) · [Türkçe](#türkçe) · [Hızlı başlangıç](#hızlı-başlangıç)
+[Demo](#demo) · [Quick start](#quick-start) · [English](#english) · [Türkçe](#türkçe) · [Hızlı başlangıç](#hızlı-başlangıç)
 
 </div>
+
+---
+
+## Demo
+
+A real project made with Reelsmith: a 7-scene, 2:22 Reel about the gemstone "Zebercet" (peridot) for Taş Galerisi.<br/>
+Reelsmith ile yapılmış gerçek bir proje: Taş Galerisi için "Zebercet" taşı hakkında 7 sahneli, 2:22'lik bir Reels.
+
+<div align="center">
+
+<img src="assets/demo-before-after.gif" width="540" alt="Left: the raw scene clip. Right: the same scene in the finished Reel with slow camera move, captions and the logo watermark"/>
+
+<img src="assets/demo-frames.jpg" width="100%" alt="Five frames from the finished Reel, each with word-timed yellow captions and the moving logo"/>
+
+**[Watch the full Reel (2:22, 48 MB) / Videonun tamamını izle](https://github.com/EmirhanYAZICI/reelsmith/releases/download/v1.3.0/reelsmith-demo-zebercet.mp4)**
+
+</div>
+
+| | Input / Girdi | Output / Çıktı |
+|---|---|---|
+| Video | 7 clips, 10 s each, 720x1280, no captions / 7 klip, 10'ar sn, altyazısız | 2:22, 1080x1920, 30 fps, H.264 + AAC |
+| Audio | 2:22 voiceover + the clips' own sound / seslendirme + kliplerin sesi | -14 LUFS, peak -0.9 dBFS, clip sound ducked under speech |
+| Text | Scene script, 239 words / sahne metni, 239 kelime | 97 word-timed caption blocks / kelime zamanlı altyazı bloğu |
+| Brand | `logo.png` | Moving watermark, corner to corner / köşeden köşeye kayan logo |
+
+Time: about 15-25 minutes for a 2-3 minute Reel on a mid-range laptop (tested on Intel i5-13420H, 16 GB RAM), mostly clip slow-motion and the render. Whisper and alignment take under a minute.
 
 ---
 
@@ -61,6 +89,12 @@ my-brand/
 /reelsmith my-brand reel.mp4 white text, box style, word by word
 ```
 
+Before anything slow starts, the agent runs a preflight check and tells you what is missing or broken (a missing scene number, a corrupt clip, no logo, a missing tool). You can run it yourself too:
+
+```bash
+python skills/reelsmith/template/scripts/check.py --src=~/Desktop/my-brand
+```
+
 The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it. No API keys are needed. Everything runs on your machine.
 
 ## Hızlı başlangıç
@@ -100,6 +134,12 @@ markam/
 
 ```
 /reelsmith markam reels.mp4 beyaz yazı, kutulu, kelime kelime hoplasın
+```
+
+Uzun işler başlamadan önce ajan bir ön kontrol çalıştırır ve eksik ya da bozuk olanı söyler (eksik sahne numarası, bozuk klip, logo yok, eksik araç). İstersen kendin de çalıştırabilirsin:
+
+```bash
+python skills/reelsmith/template/scripts/check.py --src=~/Desktop/markam
 ```
 
 Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne kaydedilir. API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
@@ -153,6 +193,17 @@ Captions always sit in the same place: Calibri Bold 75 px, 450 px from the botto
 Through an agent, you can describe the captions in plain words, for example: `/reelsmith my-folder white text, boxed, words hop in one by one`.
 See [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md) for the full list and ready-made presets.
 
+### Logo: moving, fixed or intro/outro
+
+| Option | Default | Values |
+|---|---|---|
+| `--logo-mode` | `move` | `move` (glides corner to corner, hard to crop out), `corner` (stays in one corner), `ends` (large and centered at the start and the end). `ends` combines with the others: `move,ends`, `corner,ends` |
+| `--logo-pos` | `bottom-left` | `bottom-left`, `bottom-right`, `top-left`, `top-right` (start corner for `move`, the corner for `corner`) |
+| `--logo-size` | `258` | width in px, 80-700 |
+| `--logo-moves` | `6` | how many corner-to-corner moves over the whole video (fewer = slower) |
+
+The logo is always used as uploaded: original colors, full opacity, no effects. You can say it in words too: `/reelsmith my-folder logo fixed top right, also big at the start and end`.
+
 ### Requirements
 
 | Tool | Notes |
@@ -160,7 +211,7 @@ See [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md) for the full list 
 | An agent with a local shell | Claude Code, Cursor, Codex CLI, OpenCode, Antigravity... Web chat apps without a local shell cannot run it |
 | [OpenMontage](https://github.com/calesthio/OpenMontage) | Workspace and Python 3.12 virtual environment |
 | Python packages | `faster-whisper`, `numpy` (see `requirements.txt`) |
-| Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes` (tested with 0.8.x) |
+| Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes@0.8` (tested with 0.8.x) |
 | ffmpeg / ffprobe | Must be on `PATH` |
 | Calibri Bold font | Ships with Windows (`C:\Windows\Fonts\calibrib.ttf`). It is **not** included here for licensing reasons. On other systems pass `--font=<path>` |
 
@@ -191,7 +242,7 @@ The manual steps below do the same thing by hand.
 ```bash
 OM=~/Projects/OpenMontage                      # wherever OpenMontage lives
 $OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
-npm i -g hyperframes
+npm i -g hyperframes@0.8
 npx hyperframes skills                         # official HyperFrames skills for your agents
 ```
 
@@ -226,7 +277,7 @@ To check the install in Claude Code, type `/`. You should see `reelsmith` and `w
    |---|---|
    | Voiceover | Name contains `seslendirme`, `voice` or `vo` (`.mp3`, `.wav`, `.m4a`) |
    | Scene clips | `scene1.mp4`, `scene2.mp4`, ... (Turkish `1sahne.mp4` also works) vertical, about 10 s each. Their own audio is kept |
-   | Scene script | `.txt` or `.md` with one `Metin karşılığı: "...")` line per scene, holding exactly the text spoken in that scene |
+   | Scene script | `.txt` or `.md` with exactly the text spoken in each scene: one paragraph per scene (blank line between), or one `Text: "..."` line per scene, or the original `Metin karşılığı: "...")` lines |
    | Logo | `logo.png`, transparent background |
    | Optional | `REELS-REHBERI.md` with project-specific rules. It overrides the bundled guide |
 
@@ -238,6 +289,29 @@ To check the install in Claude Code, type `/`. You should see `reelsmith` and `w
 3. Clip preparation and rendering take about 15-25 minutes. The finished video is copied into your folder and into a `cikti/` folder next to it.
 
 To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md).
+
+### Supported and not supported
+
+| Supported | Not supported (yet) |
+|---|---|
+| Vertical 1080x1920 at 30 fps | Other sizes or frame rates (16:9, 1:1, 60 fps) |
+| Any number of scenes, one or more clips per scene | Cutting clips on music beats (clips are fitted to the narration) |
+| Turkish voiceover (Whisper `language="tr"`); other languages by changing one argument | Automatic translation or voice generation |
+| Windows (tested end to end); macOS and Linux run the installer and tests in CI | Rendering without Node.js / Chromium |
+| Agents with a local shell | ChatGPT or Claude web chat (no local shell) |
+
+The tested project is 2:22 long. Longer videos work the same way but take proportionally longer, mostly in clip slow-motion and the render.
+
+### Development and tests
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests
+```
+
+The tests cover scene file names, script parsing, caption and logo options, Whisper-to-script alignment (misheard and missing words), the preflight check with real generated media, and a full build without the final render: clip slow-motion, 1080x1920 crop, composition data and the audio mix. If HyperFrames is installed, the generated composition is also linted. CI runs them on Windows and Ubuntu and installs the skills with both installers on Windows, macOS and Ubuntu.
+
+Found a bug? Open an [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) and paste the preflight output.
 
 ### Repository layout
 
@@ -251,7 +325,9 @@ To run it by hand without an agent, see step 3 in [`skills/reelsmith/SKILL.md`](
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests |
 | `AGENTS.md` | Pointer for agents that read `AGENTS.md` instead of skills |
 | `install.ps1`, `install.sh` | One-command installer (Windows / macOS, Linux, Git Bash) |
-| `assets/` | Banner (`banner.svg`) and social preview image |
+| `skills/reelsmith/template/scripts/check.py` | Preflight check: tools, clips, voiceover, logo, script |
+| `tests/` | pytest suite (runs in GitHub Actions on Windows and Ubuntu) |
+| `assets/` | Banner, social preview image and demo images |
 
 ### Origin
 
@@ -306,6 +382,17 @@ Altyazı hep aynı yerdedir: Calibri Bold 75 px, alttan 450 px, ortalı. Sadece 
 Ajana cümleyle de söyleyebilirsin, örneğin: `/reelsmith klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
 Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPTION-STYLES.md).
 
+### Logo: hareketli, sabit ya da açılış/kapanış
+
+| Seçenek | Varsayılan | Değerler |
+|---|---|---|
+| `--logo-mode` | `move` | `move` (köşeden köşeye kayar, kesip atmak zor), `corner` (tek köşede sabit), `ends` (açılışta ve kapanışta ortada büyük). `ends` diğerleriyle birleşir: `move,ends`, `corner,ends` |
+| `--logo-pos` | `bottom-left` | `bottom-left`, `bottom-right`, `top-left`, `top-right` (`move` için başlangıç köşesi, `corner` için durduğu köşe) |
+| `--logo-size` | `258` | px cinsinden genişlik, 80-700 |
+| `--logo-moves` | `6` | video boyunca kaç kez köşe değiştirir (az = daha yavaş) |
+
+Logo hep yüklendiği gibi kullanılır: kendi rengi, tam opak, efektsiz. Cümleyle de söyleyebilirsin: `/reelsmith klasorum logo sağ üstte sabit dursun, başta ve sonda da büyük çıksın`.
+
 ### Gereksinimler
 
 | Araç | Not |
@@ -313,7 +400,7 @@ Tüm liste ve hazır kombinasyonlar: [`CAPTION-STYLES.md`](skills/reelsmith/CAPT
 | Yerel terminali olan bir ajan | Claude Code, Cursor, Codex CLI, OpenCode, Antigravity... Yerel terminali olmayan web sohbet uygulamaları bunu çalıştıramaz |
 | [OpenMontage](https://github.com/calesthio/OpenMontage) | Çalışma alanı ve Python 3.12 sanal ortamı |
 | Python paketleri | `faster-whisper`, `numpy` (bkz. `requirements.txt`) |
-| Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes` (0.8.x ile test edildi) |
+| Node.js + [HyperFrames](https://www.npmjs.com/package/hyperframes) | `npm i -g hyperframes@0.8` (0.8.x ile test edildi) |
 | ffmpeg / ffprobe | `PATH`'te olmalı |
 | Calibri Bold | Windows'ta hazır gelir (`C:\Windows\Fonts\calibrib.ttf`). Lisans gereği bu repoda **yok**. Başka sistemde `--font=<yol>` ver |
 
@@ -336,7 +423,7 @@ Aşağıdaki elle kurulum adımları aynı işi tek tek yapar.
 ```bash
 OM=~/Projects/OpenMontage                      # OpenMontage nerede ise
 $OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS: $OM/.venv/bin/python
-npm i -g hyperframes
+npm i -g hyperframes@0.8
 npx hyperframes skills                         # resmi HyperFrames skill'leri
 ```
 
@@ -361,7 +448,7 @@ Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görü
    |---|---|
    | Seslendirme | Adında `seslendirme`, `voice` ya da `vo` geçsin (`.mp3`, `.wav`, `.m4a`) |
    | Sahne videoları | `1sahne.mp4` ya da `scene1.mp4`, ... dikey, her biri ~10 sn. Kendi sesleri korunur |
-   | Sahne metni | `.txt` ya da `.md`. Her sahne için bir `Metin karşılığı: "...")` satırı. İçinde o sahnede okunan metin olsun |
+   | Sahne metni | `.txt` ya da `.md`, her sahnede okunan metnin aynısı: her sahne bir paragraf (arada boş satır), ya da her sahne için bir `Metin: "..."` satırı, ya da orijinal `Metin karşılığı: "...")` satırları |
    | Logo | `logo.png`, şeffaf arka plan |
    | İsteğe bağlı | `REELS-REHBERI.md`: projeye özel kurallar. Skill'deki rehberin yerine geçer |
 
@@ -373,6 +460,29 @@ Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görü
 3. Klip hazırlığı ve render yaklaşık 15-25 dakika sürer. Bitmiş video senin klasörüne ve yanındaki `cikti/` klasörüne kopyalanır.
 
 Ajan olmadan elle çalıştırmak için [`skills/reelsmith/SKILL.md`](skills/reelsmith/SKILL.md) içindeki 3. adıma bak.
+
+### Desteklenenler ve desteklenmeyenler
+
+| Destekleniyor | Henüz desteklenmiyor |
+|---|---|
+| Dikey 1080x1920, 30 fps | Başka boyut ya da fps (16:9, 1:1, 60 fps) |
+| İstediğin kadar sahne, sahne başına bir ya da daha fazla klip | Klipleri müzik vuruşuna göre kesmek (klipler anlatıma göre ayarlanır) |
+| Türkçe seslendirme (Whisper `language="tr"`); başka dil tek parametreyle | Otomatik çeviri ya da ses üretimi |
+| Windows (uçtan uca test edildi); macOS ve Linux'ta kurulum ve testler CI'da çalışır | Node.js / Chromium olmadan render |
+| Yerel terminali olan ajanlar | ChatGPT ya da Claude web sohbeti (yerel terminal yok) |
+
+Test edilen proje 2:22 uzunluğunda. Daha uzun videolar da aynı şekilde çalışır ama süre orantılı uzar; en çok klip yavaşlatma ve render zaman alır.
+
+### Geliştirme ve testler
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests
+```
+
+Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı ve logo seçenekleri, Whisper ile metin eşleştirme (yanlış duyulan ve hiç duyulmayan kelimeler), gerçek üretilmiş medya ile ön kontrol ve son render hariç tam kurgu: klip yavaşlatma, 1080x1920 kırpma, kompozisyon verisi ve ses miksajı. HyperFrames kuruluysa üretilen kompozisyon lint'ten de geçer. CI bunları Windows ve Ubuntu'da çalıştırır, iki kurulum aracıyla skill'leri Windows, macOS ve Ubuntu'ya kurar.
+
+Hata mı buldun? Bir [issue](https://github.com/EmirhanYAZICI/reelsmith/issues/new/choose) aç ve ön kontrol çıktısını yapıştır.
 
 ### Nereden çıktı
 

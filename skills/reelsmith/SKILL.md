@@ -32,7 +32,16 @@ Dosyaları türüne göre ayır: seslendirme, sahne videoları (numaralarıyla),
 - Video sayısı = metindeki `Metin karşılığı` sayısı mı? Değilse eksik numarayı söyle ve sor.
 - Ayrı müzik dosyası varsa: varsayılan kural "ayrı müzik yok, kliplerin kendi sesi kalır". Kullanıcı müziği kendisi koyduysa ne yapılacağını bir cümleyle sor.
 - Belirsiz bir şey yoksa sorma, devam et. Kullanıcı "plan sorma" dediyse planı sadece bilgi olarak yaz.
+- Sahne metni üç biçimden biri olabilir: `Metin karşılığı: "…")` satırları, `Metin:`/`Text:` satırları ya da her sahne bir paragraf.
 - Altyazı rengi / stili / animasyonu kullanıcı söylediyse (ör. "beyaz, kutulu, kelime kelime hoplasın") `SKILL_DIR/CAPTION-STYLES.md`'den karşılığını bul. Söylemediyse varsayılan: sarı + kontur + pop.
+
+## 2b. Ön kontrol (her zaman, uzun işlerden önce)
+Proje kopyalanmadan önce de çalışır (`OM` için 3. adıma bak):
+```bash
+"$OM/.venv/Scripts/python.exe" "SKILL_DIR/template/scripts/check.py" --src="<klasör>" [--script=] [--vo=] [--logo=] [--caption-*=] [--logo-*=]
+```
+- FAIL varsa dur, sorunu ve çözümü kullanıcıya düz cümleyle söyle (ör. "3. sahnenin videosu yok", "2sahne.mp4 bozuk görünüyor"). Düzeltince tekrar çalıştır.
+- WARN render'ı durdurmaz; kullanıcıya bir cümleyle bildir (ör. yatay klip kırpılacak, logo şeffaf değil).
 
 ## 3. Çalıştır
 Kod bu skill'in içinde: `SKILL_DIR/template/` (Python scriptleri + HyperFrames şablonu).
@@ -45,14 +54,18 @@ OM="${OPENMONTAGE_DIR:-$HOME/Projects/OpenMontage}"; P="$OM/projects/<konu>-reel
 cp -r "SKILL_DIR/template" "$P" && mkdir -p "$P/artifacts" "$P/assets/audio" && cd "$P"
 PY=../../.venv/Scripts/python.exe          # Linux/macOS: ../../.venv/bin/python
 export PYTHONIOENCODING=utf-8 HF_HUB_DISABLE_XET=1
+STIL="--caption-color=yellow --caption-style=outline --caption-anim=pop"   # CAPTION-STYLES.md
+LOGO="--logo-mode=move --logo-pos=bottom-left"                            # REELS-REHBERI.md > Logo
+$PY scripts/check.py --src="<klasör>" $STIL $LOGO                                          # FAIL varsa dur
 $PY scripts/transcribe.py "<seslendirme>" artifacts/voiceover_transcript.json "<metindeki özel isimler>"
 $PY scripts/align.py "<sahne metni>"
-STIL="--caption-color=yellow --caption-style=outline --caption-anim=pop"   # CAPTION-STYLES.md
-$PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL --no-render
+$PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL $LOGO --no-render
 (cd composition_video && npx --no-install hyperframes snapshot --at 0.5,10,30,60,90 --no-end)   # kareleri gör
-$PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL --skip-prep    # render, arka planda
+$PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL $LOGO --skip-prep    # render, arka planda
 ```
-- Altyazı seçenekleri (`--caption-color`, `--caption-outline`, `--caption-style`, `--caption-anim`) iki komutta da aynı verilmeli.
+- Altyazı (`--caption-*`) ve logo (`--logo-mode`, `--logo-pos`, `--logo-size`, `--logo-moves`) seçenekleri bütün komutlarda aynı verilmeli.
+- Kullanıcı logo için bir şey söylemediyse `$LOGO` varsayılan kalır (hareketli, sol alttan). "Sabit", "sağ üstte", "başta ve sonda büyük" gibi istekleri `REELS-REHBERI.md` > Logo tablosundan çevir.
+- Render yarıda kesilirse klipler hazırdır: aynı komutu `--skip-prep` ile tekrar çalıştır.
 - Altyazı fontu Calibri Bold. Lisans gereği repoda yok. Script Windows'taki `C:\Windows\Fonts\calibrib.ttf` dosyasını kopyalar. Başka sistemde `--font=<yol>` ver.
 - Klip hazırlığı + render 15-25 dk sürer. Arka planda çalıştır, bitince bildirim gelir. Bekleme döngüsü kurma.
 
@@ -69,7 +82,7 @@ Bir projede kullanıcı onaylı yeni bir ayar yapılırsa (logo, altyazı, ses�
 - Orijinal dosyaları değiştirme ya da silme. Kullanıcının söylemediği dosyayı kullanma.
 - Ücretli API (Veo, Kling, ElevenLabs…) kullanmadan önce sor.
 - Altyazı: yer ve boyut sabit (dikey, Calibri Bold 75px, alttan 450px, 2-3 kelime, yazım metinden). Sadece renk, stil ve animasyon değişir. Varsayılan sarı `#F8D85A` + siyah kontur + pop.
-- Logo yüklendiği gibi (rengi neyse o) ve tam opak. Soluk değil, efekt yok. Sol alttan başlar, video boyunca köşeden köşeye yavaşça kayar.
+- Logo yüklendiği gibi (rengi neyse o) ve tam opak. Soluk değil, efekt yok. Varsayılan: sol alttan başlar, video boyunca köşeden köşeye yavaşça kayar. Kullanıcı isterse sabit köşe ya da açılış/kapanış logosu (`--logo-mode`).
 - Ani zoom ya da punch-in yok. Sahne boyunca tek yumuşak dolly.
 - Klip sesleri kalır. Konuşmada -9 dB kısılır. Ayrı müzik yok.
 - 30 FPS.

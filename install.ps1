@@ -100,7 +100,7 @@ if (-not $SkillsOnly) {
     Run { & $Vpy -m pip install -q -r (Join-Path $Src 'requirements.txt') }
 
     Say 'HyperFrames'
-    if (Has hyperframes) { Ok 'hyperframes' } else { Run { npm i -g hyperframes } }
+    if (Has hyperframes) { Ok 'hyperframes' } else { Run { npm i -g hyperframes@0.8 } }
     if (-not $NoHfSkills) {
         try { Run { npx -y hyperframes skills } } catch { Warn 'npx hyperframes skills failed; run it by hand later' }
     }

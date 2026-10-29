@@ -99,6 +99,16 @@
         height: var(--logo-h);
         display: block;
       }
+      /* açılış / kapanış logosu (--logo-mode=ends): ortada büyük */
+      #logo-end {
+        position: absolute;
+        left: 50%;
+        top: 46%;
+        width: 600px;
+        height: auto;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+      }
       /* Referans altyazı stili: Calibri Bold, açık sarı, kalın siyah kontur + gölge.
          720p'de 50pt / alt boşluk 300px -> 1080x1920'de 75px / 450px */
       .chunk {
@@ -174,6 +184,7 @@
         <div id="logo-wrap">
           <img id="logo" src="assets/logo.png" alt="" />
         </div>
+        <img id="logo-end" src="assets/logo.png" alt="" />
       </div>
     </div>
 
@@ -326,17 +337,37 @@
           tl.to(el, { opacity: 0, duration: 0.06, ease: "none" }, Math.max(c.start + 0.1, end - 0.06));
         });
 
-        // logo = kayan filigran (kopyalanmaya karşı): yüklendiği gibi, tam opak (soluk değil,
-        // efekt yok). Video boyunca köşeden köşeye yavaşça kayar: sol alt -> sağ üst -> sağ alt -> sol üst -> ...
-        const LOGO_SCALE = 0.76, CORNER_LEGS = 6;  // video süresi bu kadar ayağa bölünür (2 dk'da ~24 sn/ayak)
-        const lw = 340 * LOGO_SCALE, lh = document.getElementById("logo-wrap").offsetHeight * LOGO_SCALE;
+        // logo: yüklendiği gibi, tam opak (soluk değil, efekt yok). D.logo (build_video.py --logo-*):
+        //   move   - kayan filigran (kopyalanmaya karşı), köşeden köşeye yavaşça kayar (varsayılan)
+        //   corner - seçilen köşede sabit durur
+        //   ends   - açılışta ve kapanışta ortada büyük görünür; move/corner ile birleşebilir
+        const LOGO = Object.assign({ modes: ["move"], pos: "bottom-left", size: 258, moves: 6 }, D.logo || {});
+        const LOGO_SCALE = LOGO.size / 340;
+        const lw = LOGO.size, lh = document.getElementById("logo-wrap").offsetHeight * LOGO_SCALE;
         const X0 = 40, X1 = 1080 - lw - 40, Y0 = 140, Y1 = 1370 - lh;  // altyazı bandının üstünde kalır
-        const corners = [[X0, Y1], [X1, Y0], [X1, Y1], [X0, Y0]];
-        const leg = DUR / CORNER_LEGS;
-        tl.set("#logo-wrap", { x: X0, y: Y1, scale: LOGO_SCALE, transformOrigin: "0 0", opacity: 1 }, 0);
-        for (let k = 0; k < CORNER_LEGS; k++) {
-          const [nx, ny] = corners[(k + 1) % corners.length];
-          tl.to("#logo-wrap", { x: nx, y: ny, duration: leg, ease: "sine.inOut" }, k * leg);
+        const CORNER = { "bottom-left": [X0, Y1], "top-right": [X1, Y0], "bottom-right": [X1, Y1], "top-left": [X0, Y0] };
+        const ORDER = ["bottom-left", "top-right", "bottom-right", "top-left"];  // sol alt -> sağ üst -> sağ alt -> sol üst
+        const has = (m) => LOGO.modes.includes(m);
+        const [sx, sy] = CORNER[LOGO.pos] || CORNER["bottom-left"];
+        const mark = has("move") || has("corner");
+        // ends varsa köşedeki logo açılış bitene kadar gizli başlar
+        tl.set("#logo-wrap", { x: sx, y: sy, scale: LOGO_SCALE, transformOrigin: "0 0", opacity: mark && !has("ends") ? 1 : 0 }, 0);
+        if (has("move")) {
+          const leg = DUR / LOGO.moves, k0 = ORDER.indexOf(LOGO.pos);
+          for (let k = 0; k < LOGO.moves; k++) {
+            const [nx, ny] = CORNER[ORDER[(k0 + k + 1) % ORDER.length]];
+            tl.to("#logo-wrap", { x: nx, y: ny, duration: leg, ease: "sine.inOut" }, k * leg);
+          }
+        }
+        if (has("ends")) {
+          const IN = 2.6, OUT = Math.max(IN + 1, DUR - 2.8);  // açılış 0-2.6 sn, kapanış son 2.8 sn
+          tl.fromTo("#logo-end", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.to("#logo-end", { opacity: 0, duration: 0.4, ease: "power1.in" }, IN - 0.4);
+          tl.fromTo("#logo-end", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, OUT);
+          if (mark) {  // büyük logo görünürken köşedeki logo gizlenir
+            tl.fromTo("#logo-wrap", { opacity: 0 }, { opacity: 1, duration: 0.01, immediateRender: false }, IN);
+            tl.to("#logo-wrap", { opacity: 0, duration: 0.01 }, OUT);
+          }
         }
 
         window.__timelines["main"] = tl;

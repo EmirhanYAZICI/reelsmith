@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Settings guide / Ayar rehberi
+    url: https://github.com/EmirhanYAZICI/reelsmith/blob/main/skills/reelsmith/REELS-REHBERI.md
+    about: Captions, logo, audio and troubleshooting (Turkish) / Altyazı, logo, ses ve sorun giderme

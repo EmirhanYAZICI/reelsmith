@@ -115,7 +115,7 @@ if [ "$DEPS" = 1 ]; then
   run "$VPY" -m pip install -q -r "$SRC/requirements.txt"
 
   say "HyperFrames"
-  if has hyperframes; then ok "hyperframes $(hyperframes --version 2>/dev/null || true)"; else run npm i -g hyperframes; fi
+  if has hyperframes; then ok "hyperframes $(hyperframes --version 2>/dev/null || true)"; else run npm i -g hyperframes@0.8; fi
   if [ "$HF_SKILLS" = 1 ]; then run npx -y hyperframes skills || warn "npx hyperframes skills failed; run it by hand later"; fi
 
   case "$OM" in "$HOME/Projects/OpenMontage") ;; *)

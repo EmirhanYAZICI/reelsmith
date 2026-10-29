@@ -1,0 +1,16 @@
+name: Feature request / Özellik isteği
+description: Suggest a new option or improvement / Yeni bir seçenek ya da iyileştirme öner
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you want to do? / Ne yapmak istiyorsun?
+      description: Describe the result you want in the Reel. / Reels'te görmek istediğin sonucu anlat.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could it work? / Nasıl çalışabilir?
+      description: For example a new flag like `--caption-anim=typewriter`. / Örneğin yeni bir seçenek.
