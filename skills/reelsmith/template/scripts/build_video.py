@@ -95,12 +95,13 @@ def probe_duration(p: Path) -> float:
 
 
 ORDINALS = {"birinci": 1, "ilk": 1, "ikinci": 2, "üçüncü": 3, "ucuncu": 3, "dördüncü": 4, "dorduncu": 4,
-            "beşinci": 5, "besinci": 5, "altıncı": 6, "altinci": 6, "yedinci": 7}
+            "beşinci": 5, "besinci": 5, "altıncı": 6, "altinci": 6, "yedinci": 7,
+            "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7}
 
 
 def scene_number(stem: str) -> int | None:
-    """'sahne 1', 'sahne1_b', '1.sahne', '1 sahne', 'ikinci sahne' -> sahne numarası."""
-    s = re.sub(r"sah[en]{2}|shane|sahn", "sahne", stem.lower())  # 'sahen' gibi yazım hataları
+    """'sahne 1', '1.sahne', 'ikinci sahne', 'scene1', 'scene_2b', 'third scene' -> sahne numarası."""
+    s = re.sub(r"scene|sah[en]{2}|shane|sahn", "sahne", stem.lower())  # 'sahen' gibi yazım hataları
     if "sahne" not in s:
         return None
     m = re.search(r"sahne\s*[._-]?\s*(\d+)", s) or re.search(r"(\d+)\s*[._-]?\s*\.?\s*sahne", s)

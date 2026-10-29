@@ -1,6 +1,6 @@
 ---
 name: reelsmith
-description: Herhangi bir firma/marka için Instagram Reels videosu üretir (OpenMontage + Whisper + HyperFrames + ffmpeg). Kullanıcı bir klasör açar; içine seslendirme, sahne videoları (1sahne.mp4…), sahne metni, logo ve isteğe bağlı REELS-REHBERI.md koyar. Kullan - kullanıcı "reels yap", "reels videosu", "klasörü koydum başla", "/reelsmith <klasör>" dediğinde.
+description: Herhangi bir firma/marka için Instagram Reels videosu üretir (OpenMontage + Whisper + HyperFrames + ffmpeg). Kullanıcı bir klasör açar; içine seslendirme, sahne videoları (1sahne.mp4 ya da scene1.mp4…), sahne metni, logo ve isteğe bağlı REELS-REHBERI.md koyar. Kullan - kullanıcı "reels yap", "reels videosu", "klasörü koydum başla", "/reelsmith <klasör>" dediğinde.
 argument-hint: "<klasör adı veya yolu> [video adı]"
 ---
 

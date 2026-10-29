@@ -134,9 +134,9 @@
     <text x="708" y="132" class="sans" font-size="15" font-weight="700" fill="#E6EDF3">my-brand/</text>
     <g fill="#C9D4DF">
       <rect x="708" y="152" width="10" height="12" rx="2" fill="#B79CFF"/><text x="728" y="163">voiceover.mp3</text>
-      <rect x="708" y="190" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="201">1sahne.mp4</text>
-      <rect x="708" y="228" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="239">2sahne.mp4</text>
-      <rect x="708" y="266" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="277">3sahne.mp4</text>
+      <rect x="708" y="190" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="201">scene1.mp4</text>
+      <rect x="708" y="228" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="239">scene2.mp4</text>
+      <rect x="708" y="266" width="10" height="12" rx="2" fill="#5AC8FA"/><text x="728" y="277">scene3.mp4</text>
       <rect x="708" y="304" width="10" height="12" rx="2" fill="#F8D85A"/><text x="728" y="315">script.txt</text>
       <rect x="708" y="342" width="10" height="12" rx="2" fill="#FFFFFF"/><text x="728" y="353">logo.png</text>
     </g>

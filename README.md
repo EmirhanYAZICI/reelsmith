@@ -2,7 +2,7 @@
 
 <img src="assets/banner.svg" width="100%" alt="Reelsmith: an AI agent turns a folder with a voiceover, scene clips, a script and a logo into a captioned 1080x1920 Instagram Reel"/>
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=23F7DD&center=true&vCenter=true&width=700&lines=Folder+in.+Instagram+Reel+out.;Local+Whisper+captions%2C+no+API+keys;Works+with+Claude+Code%2C+Codex%2C+Cursor%2C+OpenCode%2C+Antigravity" alt="Folder in. Instagram Reel out."/>
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=23F7DD&center=true&vCenter=true&width=900&lines=Folder+in.+Instagram+Reel+out.;Local+Whisper+captions%2C+no+API+keys;Claude+Code%2C+Codex%2C+Cursor%2C+OpenCode%2C+Antigravity" alt="Folder in. Instagram Reel out."/>
 
 <a href="#quick-start"><img src="https://img.shields.io/badge/Claude_Code-Skill_%2B_Plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code skill and plugin"/></a>
 <a href="#quick-start"><img src="https://img.shields.io/badge/Agent_Skills-SKILL.md-23F7DD?style=for-the-badge&labelColor=000000" alt="Open SKILL.md format"/></a>
@@ -52,7 +52,7 @@ For one agent with the installer: `.\install.ps1 -Agents codex` or `./install.sh
 ```
 my-brand/
 ├── voiceover.mp3      the narration
-├── 1sahne.mp4         scene 1 clip   (2sahne.mp4, 3sahne.mp4 ...)
+├── scene1.mp4         scene 1 clip   (scene2.mp4, scene3.mp4 ...)
 ├── script.txt         the text of each scene
 └── logo.png           your logo, used as the moving watermark
 ```
@@ -93,7 +93,7 @@ curl -fsSL https://raw.githubusercontent.com/EmirhanYAZICI/reelsmith/main/instal
 ```
 markam/
 ├── seslendirme.mp3    anlatım sesi
-├── 1sahne.mp4         1. sahne videosu   (2sahne.mp4, 3sahne.mp4 ...)
+├── scene1.mp4         1. sahne videosu   (scene2.mp4 ... ya da 1sahne.mp4)
 ├── metin.txt          her sahnenin metni
 └── logo.png           logon, video boyunca köşeden köşeye gezer
 ```
@@ -225,7 +225,7 @@ To check the install in Claude Code, type `/`. You should see `reelsmith` and `w
    | File | Rule |
    |---|---|
    | Voiceover | Name contains `seslendirme`, `voice` or `vo` (`.mp3`, `.wav`, `.m4a`) |
-   | Scene clips | `1sahne.mp4`, `2sahne.mp4`, ... vertical, about 10 s each. Their own audio is kept |
+   | Scene clips | `scene1.mp4`, `scene2.mp4`, ... (Turkish `1sahne.mp4` also works) vertical, about 10 s each. Their own audio is kept |
    | Scene script | `.txt` or `.md` with one `Metin karşılığı: "...")` line per scene, holding exactly the text spoken in that scene |
    | Logo | `logo.png`, transparent background |
    | Optional | `REELS-REHBERI.md` with project-specific rules. It overrides the bundled guide |
@@ -360,7 +360,7 @@ Claude Code'da kontrol için `/` yaz. Listede `reelsmith` ve `whisper-tr` görü
    | Dosya | Kural |
    |---|---|
    | Seslendirme | Adında `seslendirme`, `voice` ya da `vo` geçsin (`.mp3`, `.wav`, `.m4a`) |
-   | Sahne videoları | `1sahne.mp4`, `2sahne.mp4`, ... dikey, her biri ~10 sn. Kendi sesleri korunur |
+   | Sahne videoları | `1sahne.mp4` ya da `scene1.mp4`, ... dikey, her biri ~10 sn. Kendi sesleri korunur |
    | Sahne metni | `.txt` ya da `.md`. Her sahne için bir `Metin karşılığı: "...")` satırı. İçinde o sahnede okunan metin olsun |
    | Logo | `logo.png`, şeffaf arka plan |
    | İsteğe bağlı | `REELS-REHBERI.md`: projeye özel kurallar. Skill'deki rehberin yerine geçer |
