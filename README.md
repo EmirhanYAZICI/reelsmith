@@ -60,6 +60,14 @@ The only tokens spent are your agent's. The agent reads about 20K tokens of inst
 
 ## Quick start
 
+**Fastest: one line with the [skills](https://skills.sh/EmirhanYAZICI/reelsmith-media) CLI.** It copies both skills into Claude Code, Cursor, Codex, OpenCode, Antigravity and other agents (it asks which):
+
+```bash
+npx skills add EmirhanYAZICI/reelsmith-media
+```
+
+This adds the skills only. The video tools (ffmpeg, Python 3.10-3.12 with faster-whisper, HyperFrames) still have to be on your machine: the installer in step 1 sets them up, and the skill's preflight check tells you what is missing.
+
 **1. Install everything with one command.** It sets up the tools and copies the skills into every agent it finds on your machine.
 
 ```powershell
@@ -147,6 +155,14 @@ python skills/reelsmith-media/template/scripts/check.py --src=~/Desktop/my-brand
 The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it. No API keys are needed. Everything runs on your machine.
 
 ## Hızlı başlangıç
+
+**En hızlısı: [skills](https://skills.sh/EmirhanYAZICI/reelsmith-media) aracıyla tek satır.** İki skill'i Claude Code, Cursor, Codex, OpenCode, Antigravity ve diğer ajanlara kopyalar (hangilerine kurulacağını sorar):
+
+```bash
+npx skills add EmirhanYAZICI/reelsmith-media
+```
+
+Bu sadece skill'leri ekler. Video araçlarının (ffmpeg, faster-whisper ile Python 3.10-3.12, HyperFrames) bilgisayarında olması gerekir: 1. adımdaki kurulum aracı bunları kurar, skill'in ön kontrolü de eksik olanı söyler.
 
 **1. Her şeyi tek komutla kur.** Gerekli araçları hazırlar ve skill'leri bilgisayarında bulduğu her ajana kopyalar.
 
