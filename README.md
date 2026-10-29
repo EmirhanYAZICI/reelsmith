@@ -1,4 +1,4 @@
-# reels-edit
+# Reelsmith
 
 A Claude Code skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten Claude Code skill'i.
@@ -14,7 +14,7 @@ Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten Cl
 You put a voiceover, numbered scene clips, a scene script and your logo in a folder. Then you type one command:
 
 ```
-/reels-edit my-folder my_reel.mp4
+/reelsmith my-folder my_reel.mp4
 ```
 
 The skill then does the following:
@@ -51,7 +51,7 @@ Captions always sit in the same place: Calibri Bold 75 px, 450 px from the botto
 | `--stil` (text style) | `outline` (default), `box`, `shadow`, `double` |
 | `--anim` (entry animation) | `pop` (default), `hop`, `word-hop` (each word jumps in exactly when it is spoken), `bounce`, `wave` |
 
-When you run it through Claude, you can describe the captions in plain words, for example: `/reels-edit my-folder white text, boxed, words hop in one by one`.
+When you run it through Claude, you can describe the captions in plain words, for example: `/reelsmith my-folder white text, boxed, words hop in one by one`.
 See [`ALTYAZI-STILLERI.md`](ALTYAZI-STILLERI.md) for the full list and ready-made combinations.
 
 ### Requirements
@@ -71,19 +71,19 @@ No API keys are needed. Everything runs locally.
 
 ```bash
 OM=~/Projects/OpenMontage                      # wherever OpenMontage lives
-git clone https://github.com/EmirhanYAZICI/reels-edit ~/.claude/skills/reels-edit
+git clone https://github.com/EmirhanYAZICI/reelsmith ~/.claude/skills/reelsmith
 
 # companion skills, so they load from any folder
-cp -r ~/.claude/skills/reels-edit/extras/whisper-tr ~/.claude/skills/
+cp -r ~/.claude/skills/reelsmith/extras/whisper-tr ~/.claude/skills/
 cp -r $OM/.agents/skills/hyperframes $OM/.agents/skills/hyperframes-core $OM/.agents/skills/hyperframes-cli ~/.claude/skills/
 
 # Python packages into the OpenMontage venv, HyperFrames globally
-$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reels-edit/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
+$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reelsmith/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
 npm i -g hyperframes
 ```
 
 If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` environment variable to its path.
-To check the install, type `/` in Claude Code. You should see `reels-edit`, `whisper-tr` and `hyperframes-core` in the list.
+To check the install, type `/` in Claude Code. You should see `reelsmith`, `whisper-tr` and `hyperframes-core` in the list.
 
 ### Usage
 
@@ -100,7 +100,7 @@ To check the install, type `/` in Claude Code. You should see `reels-edit`, `whi
    You can use any number of scenes. The number of clips must match the number of script entries.
 2. Open Claude Code. OpenMontage is the best place, but any folder works. Then run:
    ```
-   /reels-edit <folder name or path> <output_name>.mp4 [caption wishes]
+   /reelsmith <folder name or path> <output_name>.mp4 [caption wishes]
    ```
 3. Clip preparation and rendering take about 15-25 minutes. The finished video is copied into your folder and into a `cikti/` folder next to it.
 
@@ -133,7 +133,7 @@ The skill was built and tested on a real project, a 7-scene, 2:22 Reel about the
 Bir klasöre seslendirme, numaralı sahne videoları, sahne metni ve logonu koyarsın. Sonra tek komut yazarsın:
 
 ```
-/reels-edit klasorum videom.mp4
+/reelsmith klasorum videom.mp4
 ```
 
 Skill şunları yapar:
@@ -170,7 +170,7 @@ Altyazı hep aynı yerdedir: Calibri Bold 75 px, alttan 450 px, ortalı. Sadece 
 | `--stil` (yazı şekli) | `outline` (varsayılan), `box` (kutulu), `shadow` (gölgeli), `double` (çift kontur) |
 | `--anim` (giriş animasyonu) | `pop` (varsayılan), `hop`, `word-hop` (her kelime söylendiği anda zıplar), `bounce`, `wave` |
 
-Claude üzerinden çalıştırırken cümleyle söyleyebilirsin, örneğin: `/reels-edit klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
+Claude üzerinden çalıştırırken cümleyle söyleyebilirsin, örneğin: `/reelsmith klasorum beyaz yazı, kutulu, kelime kelime hoplasın`.
 Tüm liste ve hazır kombinasyonlar: [`ALTYAZI-STILLERI.md`](ALTYAZI-STILLERI.md).
 
 ### Gereksinimler
@@ -190,19 +190,19 @@ API anahtarı gerekmez. Her şey senin bilgisayarında çalışır.
 
 ```bash
 OM=~/Projects/OpenMontage                      # OpenMontage nerede ise
-git clone https://github.com/EmirhanYAZICI/reels-edit ~/.claude/skills/reels-edit
+git clone https://github.com/EmirhanYAZICI/reelsmith ~/.claude/skills/reelsmith
 
 # yardımcı skill'ler, her klasörden yüklensin diye
-cp -r ~/.claude/skills/reels-edit/extras/whisper-tr ~/.claude/skills/
+cp -r ~/.claude/skills/reelsmith/extras/whisper-tr ~/.claude/skills/
 cp -r $OM/.agents/skills/hyperframes $OM/.agents/skills/hyperframes-core $OM/.agents/skills/hyperframes-cli ~/.claude/skills/
 
 # Python paketleri OpenMontage venv'ine, HyperFrames global
-$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reels-edit/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
+$OM/.venv/Scripts/python.exe -m pip install -r ~/.claude/skills/reelsmith/requirements.txt   # Linux/macOS: $OM/.venv/bin/python
 npm i -g hyperframes
 ```
 
 OpenMontage `~/Projects/OpenMontage` dışında bir yerdeyse `OPENMONTAGE_DIR` ortam değişkenine yolunu yaz.
-Kontrol için Claude Code'da `/` yaz. Listede `reels-edit`, `whisper-tr` ve `hyperframes-core` görünmeli.
+Kontrol için Claude Code'da `/` yaz. Listede `reelsmith`, `whisper-tr` ve `hyperframes-core` görünmeli.
 
 ### Kullanım
 
@@ -219,7 +219,7 @@ Kontrol için Claude Code'da `/` yaz. Listede `reels-edit`, `whisper-tr` ve `hyp
    Sahne sayısı serbesttir. Video sayısı ile metindeki sahne sayısı eşit olmalı.
 2. Claude Code'u aç. En iyisi OpenMontage klasörü ama her klasörden çalışır. Sonra şunu yaz:
    ```
-   /reels-edit <klasör adı ya da yolu> <video_adı>.mp4 [altyazı isteği]
+   /reelsmith <klasör adı ya da yolu> <video_adı>.mp4 [altyazı isteği]
    ```
 3. Klip hazırlığı ve render yaklaşık 15-25 dakika sürer. Bitmiş video senin klasörüne ve yanındaki `cikti/` klasörüne kopyalanır.
 

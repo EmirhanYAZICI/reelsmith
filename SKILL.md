@@ -1,16 +1,16 @@
 ---
-name: reels-edit
-description: Herhangi bir firma/marka için Instagram Reels videosu üretir (OpenMontage + Whisper + HyperFrames + ffmpeg). Kullanıcı bir klasör açar; içine seslendirme, sahne videoları (1sahne.mp4…), sahne metni, logo ve isteğe bağlı REELS-REHBERI.md koyar. Kullan - kullanıcı "reels yap", "reels videosu", "klasörü koydum başla", "/reels-edit <klasör>" dediğinde.
+name: reelsmith
+description: Herhangi bir firma/marka için Instagram Reels videosu üretir (OpenMontage + Whisper + HyperFrames + ffmpeg). Kullanıcı bir klasör açar; içine seslendirme, sahne videoları (1sahne.mp4…), sahne metni, logo ve isteğe bağlı REELS-REHBERI.md koyar. Kullan - kullanıcı "reels yap", "reels videosu", "klasörü koydum başla", "/reelsmith <klasör>" dediğinde.
 argument-hint: "<klasör adı veya yolu> [video adı]"
 ---
 
-# Reels Edit (firma bağımsız)
+# Reelsmith (firma bağımsız)
 
 Her firma için çalışır. Marka = klasördeki logo. Logo ve firma adı asla sabit kodlanmaz.
 Örnek proje: Taş Galerisi, "Zebercet" Reels. Logoyu her projede kullanıcı koyar. Kendin logo seçme ya da üretme.
 
 Girdi: `$ARGUMENTS`. İlk kelime(ler) klasör adı/yolu, varsa sonrası çıktı video adı.
-Bu skill'in klasörü aşağıda `SKILL_DIR` diye geçer (bu dosyanın bulunduğu klasör, genelde `~/.claude/skills/reels-edit`).
+Bu skill'in klasörü aşağıda `SKILL_DIR` diye geçer (bu dosyanın bulunduğu klasör, genelde `~/.claude/skills/reelsmith`).
 
 ## 0. Klasörü bul
 - Tam yol verildiyse onu kullan.
