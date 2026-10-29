@@ -177,9 +177,19 @@ def mix_audio(segs: list[dict]) -> Path:
               f"atrim=0:{dur},alimiter=limit=0.89:level=false[out]")
     script = ROOT / "artifacts" / "mix_filter.txt"
     script.write_text(";\n".join(fc), encoding="utf-8")
-    sh(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex_script", str(script),
+    sh(["ffmpeg", "-v", "error", "-y", *inputs, *filter_script_args(script),
         "-map", "[out]", "-c:a", "pcm_s16le", str(out)], "ses miksajı")
     return out
+
+
+def filter_script_args(script: Path) -> list[str]:
+    """Filtre grafiğini dosyadan okutur (komut satırı uzunluk sınırına takılmasın diye).
+    ffmpeg 7+ '-/filter_complex <dosya>' ister ve yeni sürümlerde '-filter_complex_script' kaldırıldı;
+    ffmpeg 6 ve öncesi sadece '-filter_complex_script' bilir."""
+    m = re.search(r"ffmpeg version n?(\d+)", sh(["ffmpeg", "-version"], "ffmpeg sürümü"))
+    if m and int(m.group(1)) >= 7:
+        return ["-/filter_complex", str(script)]
+    return ["-filter_complex_script", str(script)]
 
 
 def use_logo() -> None:
