@@ -13,6 +13,7 @@
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=000000" alt="MIT License"/></a>
 <br/>
 <a href="https://github.com/EmirhanYAZICI/reelsmith-media/actions/workflows/ci.yml"><img src="https://github.com/EmirhanYAZICI/reelsmith-media/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
+<a href="https://skills.sh/EmirhanYAZICI/reelsmith-media"><img src="https://skills.sh/b/EmirhanYAZICI/reelsmith-media" alt="skills.sh installs"/></a>
 
 An agent skill that turns a folder of raw material into a finished, Instagram-ready vertical Reel.<br/>
 Bir klasördeki ham malzemeden Instagram'a hazır dikey Reels videosu üreten ajan skill'i.
@@ -101,7 +102,7 @@ The installer never deletes your edits: if an installed `reelsmith-media` or `wh
 | **Cursor** | installer with `-Agents cursor` / `--agents=cursor` | Ask in Agent chat: *use the reelsmith-media skill on my-brand* |
 | **OpenCode** | installer with `-Agents opencode` / `--agents=opencode` | Ask: *use the reelsmith-media skill on my-brand* |
 | **Google Antigravity** | installer with `-Agents antigravity` / `--agents=antigravity` | Ask: *use the reelsmith-media skill on my-brand* |
-| **Any other agent** | `npx skills add EmirhanYAZICI/reelsmith-media` | It reads [`AGENTS.md`](AGENTS.md) if it has no skill support |
+| **Any other agent** | `npx skills add EmirhanYAZICI/reelsmith-media` ([skills.sh page](https://skills.sh/EmirhanYAZICI/reelsmith-media)) | It reads [`AGENTS.md`](AGENTS.md) if it has no skill support |
 
 For one agent with the installer: `.\install.ps1 -Agents codex` or `./install.sh --agents=codex` (from a clone of this repo).
 
@@ -172,7 +173,7 @@ Kurulum aracı senin değişikliklerini silmez: kurulu `reelsmith-media` ya da `
 | **Cursor** | kurulum aracı `-Agents cursor` / `--agents=cursor` | Agent sohbetinde yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
 | **OpenCode** | kurulum aracı `-Agents opencode` / `--agents=opencode` | Yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
 | **Google Antigravity** | kurulum aracı `-Agents antigravity` / `--agents=antigravity` | Yaz: *markam klasöründe reelsmith-media skill'ini kullan* |
-| **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith-media` | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
+| **Diğer ajanlar** | `npx skills add EmirhanYAZICI/reelsmith-media` ([skills.sh sayfası](https://skills.sh/EmirhanYAZICI/reelsmith-media)) | Skill desteği yoksa [`AGENTS.md`](AGENTS.md) dosyasını okur |
 
 **3. Malzemeyi hazırla.** Reelsmith Media kliplerini kurgular, klip üretmez. Önce onları hazırla:
 
