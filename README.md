@@ -261,7 +261,7 @@ To run it by hand without an agent, see step 3 in [`skills/reelsmith-media/SKILL
 | Vertical 1080x1920 at 30 fps | Other sizes or frame rates (16:9, 1:1, 60 fps) |
 | Any number of scenes, one or more clips per scene | Cutting clips on music beats (clips are fitted to the narration) |
 | Any language Whisper supports (Turkish by default, `--language=en` and so on) | Automatic translation of the captions |
-| Windows (tested end to end); macOS and Linux run the installer and tests in CI | Rendering without Node.js / Chromium |
+| Windows and Ubuntu: a full render (real Whisper, HyperFrames, output check) runs in CI on every change; macOS runs the installer in CI | Rendering without Node.js / Chromium |
 | Agents with a local shell | ChatGPT or Claude web chat (no local shell) |
 | Editing clips you made | Generating clips, voiceover or translations |
 
@@ -291,7 +291,7 @@ pip install -r requirements-dev.txt
 python -m pytest tests
 ```
 
-The tests cover scene file names, script parsing, caption and logo options, Whisper-to-script alignment (misheard and missing words), the preflight check with real generated media, a full build without the final render (clip slow-motion, 1080x1920 crop, composition data, audio mix) and the output check (`verify.py`). If HyperFrames is installed, the generated composition is also linted. CI runs them on Windows and Ubuntu and installs the skills with both installers on Windows, macOS and Ubuntu.
+The tests cover scene file names, script parsing, caption and logo options, Whisper-to-script alignment (misheard and missing words), the preflight check with real generated media, a full build without the final render (clip slow-motion, 1080x1920 crop, composition data, audio mix) and the output check (`verify.py`). If HyperFrames is installed, the generated composition is also linted. CI runs them on Windows and Ubuntu, installs the skills with both installers on Windows, macOS and Ubuntu, and makes a real Reel on Ubuntu: an espeak-ng voiceover goes through Whisper, alignment, the HyperFrames render and the output check (`tests/e2e_render.py`).
 
 What was tested where, installer scenarios, the end-to-end render and what is not covered yet: [`TESTING.md`](TESTING.md). Changes per version: [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -537,7 +537,7 @@ Ajan olmadan elle çalıştırmak için [`skills/reelsmith-media/SKILL.md`](skil
 | Dikey 1080x1920, 30 fps | Başka boyut ya da fps (16:9, 1:1, 60 fps) |
 | İstediğin kadar sahne, sahne başına bir ya da daha fazla klip | Klipleri müzik vuruşuna göre kesmek (klipler anlatıma göre ayarlanır) |
 | Whisper'ın desteklediği her dil (varsayılan Türkçe, `--language=en` vb.) | Altyazıların otomatik çevirisi |
-| Windows (uçtan uca test edildi); macOS ve Linux'ta kurulum ve testler CI'da çalışır | Node.js / Chromium olmadan render |
+| Windows ve Ubuntu: her değişiklikte CI'da tam render (gerçek Whisper, HyperFrames, çıktı kontrolü); macOS'ta kurulum CI'da çalışır | Node.js / Chromium olmadan render |
 | Yerel terminali olan ajanlar | ChatGPT ya da Claude web sohbeti (yerel terminal yok) |
 | Senin ürettiğin klipleri kurgulamak | Klip, seslendirme ya da çeviri üretmek |
 
@@ -567,7 +567,7 @@ pip install -r requirements-dev.txt
 python -m pytest tests
 ```
 
-Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı ve logo seçenekleri, Whisper ile metin eşleştirme (yanlış duyulan ve hiç duyulmayan kelimeler), gerçek üretilmiş medya ile ön kontrol, son render hariç tam kurgu (klip yavaşlatma, 1080x1920 kırpma, kompozisyon verisi, ses miksajı) ve çıktı kontrolü (`verify.py`). HyperFrames kuruluysa üretilen kompozisyon lint'ten de geçer. CI bunları Windows ve Ubuntu'da çalıştırır, iki kurulum aracıyla skill'leri Windows, macOS ve Ubuntu'ya kurar.
+Testler şunları kontrol eder: sahne dosya adları, sahne metni okuma, altyazı ve logo seçenekleri, Whisper ile metin eşleştirme (yanlış duyulan ve hiç duyulmayan kelimeler), gerçek üretilmiş medya ile ön kontrol, son render hariç tam kurgu (klip yavaşlatma, 1080x1920 kırpma, kompozisyon verisi, ses miksajı) ve çıktı kontrolü (`verify.py`). HyperFrames kuruluysa üretilen kompozisyon lint'ten de geçer. CI bunları Windows ve Ubuntu'da çalıştırır, iki kurulum aracıyla skill'leri Windows, macOS ve Ubuntu'ya kurar ve Ubuntu'da gerçek bir Reels üretir: espeak-ng ile okunan seslendirme Whisper, eşleştirme, HyperFrames render ve çıktı kontrolünden geçer (`tests/e2e_render.py`).
 
 Nerede neyin test edildiği ve henüz kapsanmayanlar: [`TESTING.md`](TESTING.md). Sürüm sürüm değişiklikler: [`CHANGELOG.md`](CHANGELOG.md).
 

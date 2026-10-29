@@ -25,7 +25,8 @@ results: list[tuple[str, str]] = []
 
 
 def opt(name: str, default: str = "") -> str:
-    return next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    v = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
+    return str(Path(v).expanduser()) if v.startswith("~") else v
 
 
 def ok(msg: str) -> None:

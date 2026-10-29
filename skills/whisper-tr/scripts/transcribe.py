@@ -3,12 +3,14 @@
 Kullanım: python transcribe.py <ses> <cikti.json> ["özel isim ipucu"] [--language=tr|en|de|...|auto]
 """
 import json, subprocess, sys
+from pathlib import Path
+
 import numpy as np
 from faster_whisper import WhisperModel
 
 args = [a for a in sys.argv[1:] if not a.startswith("--language=")]
 lang = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--language=")), "tr")
-src, out = args[0], args[1]
+src, out = (str(Path(a).expanduser()) for a in args[:2])
 pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-f", "s16le", "-ac", "1", "-ar", "16000", "-"],
                      capture_output=True, check=True).stdout
 audio = np.frombuffer(pcm, np.int16).astype(np.float32) / 32768.0
