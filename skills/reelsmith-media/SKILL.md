@@ -42,6 +42,8 @@ Proje kopyalanmadan önce de çalışır (`OM` için 3. adıma bak):
 ```
 - FAIL varsa dur, sorunu ve çözümü kullanıcıya düz cümleyle söyle (ör. "3. sahnenin videosu yok", "2sahne.mp4 bozuk görünüyor"). Düzeltince tekrar çalıştır.
 - WARN render'ı durdurmaz; kullanıcıya bir cümleyle bildir (ör. yatay klip kırpılacak, logo şeffaf değil).
+- Yanlış yazılmış seçenek (ör. `--caption-colour`) FAIL verir ve doğru adı önerir. Düzeltip tekrar çalıştır.
+- Klasörde birden fazla ses dosyası varsa ve hiçbirinin adında `seslendirme` / `voice` / `vo` yoksa script tahmin etmez, durur. Kullanıcıya hangisinin seslendirme olduğunu sor, `--vo=` ile ver.
 
 ## 3. Çalıştır
 Kod bu skill'in içinde: `SKILL_DIR/template/` (Python scriptleri + HyperFrames şablonu).
@@ -58,7 +60,7 @@ STIL="--caption-color=yellow --caption-style=outline --caption-anim=pop"   # CAP
 LOGO="--logo-mode=move --logo-pos=bottom-left"                            # REELS-REHBERI.md > Logo
 $PY scripts/check.py --src="<klasör>" $STIL $LOGO                                          # FAIL varsa dur
 $PY scripts/transcribe.py "<seslendirme>" artifacts/voiceover_transcript.json "<metindeki özel isimler>" --language=tr   # İngilizce: en, bilinmiyor: auto
-$PY scripts/align.py "<sahne metni>"
+$PY scripts/align.py "<sahne metni>"                                       # UYARI satırı varsa kullanıcıya söyle
 $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL $LOGO --no-render
 (cd composition_video && npx --no-install hyperframes snapshot --at 0.5,10,30,60,90 --no-end)   # kareleri gör
 $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL $LOGO --skip-prep    # render, arka planda
@@ -68,12 +70,14 @@ $PY scripts/build_video.py --src="<klasör>" --name=<konu>_reels_final.mp4 $STIL
 - Render yarıda kesilirse klipler hazırdır: aynı komutu `--skip-prep` ile tekrar çalıştır.
 - Seslendirme Türkçe değilse `transcribe.py`'ye dilini ver: `--language=en`, `--language=de`... Emin değilsen `--language=auto`.
 - Altyazı fontu: Windows'ta Calibri Bold (`C:\Windows\Fonts\calibrib.ttf`), yoksa repodaki Carlito Bold (`template/fonts/`, Calibri ile aynı ölçüler, OFL lisanslı). Başka bir font için `--font=<yol>` ver.
+- `align.py` "sahne N başlangıcı tahmini" derse o sahnenin ilk kelimesi seslendirmede bulunamamıştır. Snapshot'ta o geçişe bak, kullanıcıya söyle.
+- `build_video.py` sonunda `UYARI` satırları çıkabilir: x2'den fazla yavaşlatılan klip görüntüde bozulma yapabilir. Kullanıcıya hangi klip olduğunu söyle; daha uzun klip ya da o sahneye ikinci klip (`sahne3_b.mp4`) önerebilirsin.
 - Klip hazırlığı + render 15-25 dk sürer. Arka planda çalıştır, bitince bildirim gelir. Bekleme döngüsü kurma.
 
 ## 4. Kontrol et ve teslim et
 - `build_video.py` render sonunda `scripts/verify.py`'yi kendisi çalıştırır: 1080x1920, 30 fps, H.264 + AAC, ≈ -14 LUFS, tepe < -0.5 dBFS, 0 donma, faststart, süre.
 - Elle: `$PY scripts/verify.py renders/<isim>.mp4 --duration=<timeline süresi>`. FAIL varsa kullanıcıya hangi kontrolün kaldığını düz cümleyle söyle.
-- Video kaynak klasöre ve `<üst klasör>/cikti/` klasörüne kopyalanır. İki yolu da kullanıcıya ver.
+- Video kaynak klasöre ve `<üst klasör>/cikti/` klasörüne kopyalanır. Aynı adlı dosya varsa üzerine yazılmaz, `_2` eki alır. Script'in yazdığı iki yolu da kullanıcıya ver.
 
 ## Şablonu güncel tut
 Bir projede kullanıcı onaylı yeni bir ayar yapılırsa (logo, altyazı, ses…) değişen dosyayı `SKILL_DIR/template/` içine de kopyala ve `REELS-REHBERI.md`'ye yaz. Sonraki projeler aynı ayarla başlar.
@@ -83,7 +87,7 @@ Bir projede kullanıcı onaylı yeni bir ayar yapılırsa (logo, altyazı, ses�
 - Ücretli API (Veo, Kling, ElevenLabs…) kullanmadan önce sor.
 - Altyazı: yer ve boyut sabit (dikey, Calibri Bold 75px, alttan 450px, 2-3 kelime, yazım metinden). Sadece renk, stil ve animasyon değişir. Varsayılan sarı `#F8D85A` + siyah kontur + pop.
 - Logo yüklendiği gibi (rengi neyse o) ve tam opak. Soluk değil, efekt yok. Varsayılan: sol alttan başlar, video boyunca köşeden köşeye yavaşça kayar. Kullanıcı isterse sabit köşe ya da açılış/kapanış logosu (`--logo-mode`).
-- Ani zoom ya da punch-in yok. Sahne boyunca tek yumuşak dolly.
+- Ani zoom, punch-in ya da sarsıntı yok. Sahne boyunca tek yumuşak dolly. Geçişte sadece crossfade + hafif flash.
 - Klip sesleri kalır. Konuşmada -9 dB kısılır. Ayrı müzik yok.
 - 30 FPS.
 - Kullanıcıyla Türkçe, sade konuş.

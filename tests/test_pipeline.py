@@ -57,13 +57,13 @@ def test_clips_are_vertical_1080x1920_30fps(built):
 
 def test_short_clip_is_slowed_to_cover_its_scene(built):
     seg = built["comp"] / "assets" / "clips" / "seg00.mp4"
-    data = json.loads(re.sub(r"^window\.ZEB = |;\s*$", "", (built["comp"] / "data.js").read_text(encoding="utf-8")))
+    data = json.loads(re.sub(r"^window\.REEL = |;\s*$", "", (built["comp"] / "data.js").read_text(encoding="utf-8")))
     s = data["segments"][0]
     assert float(probe(seg, "format=duration")) >= s["vend"] - s["vstart"]
 
 
 def test_composition_data_has_options_and_duration(built):
-    data = json.loads(re.sub(r"^window\.ZEB = |;\s*$", "", (built["comp"] / "data.js").read_text(encoding="utf-8")))
+    data = json.loads(re.sub(r"^window\.REEL = |;\s*$", "", (built["comp"] / "data.js").read_text(encoding="utf-8")))
     assert data["caption"] == {"fill": "#FFFFFF", "stroke": "#000000", "style": "box", "anim": "pop"}
     assert data["logo"]["modes"] == ["move", "ends"]
     assert len(data["segments"]) == 2
@@ -81,3 +81,58 @@ def test_composition_passes_hyperframes_lint(built):
     out = subprocess.run([shutil.which("hyperframes"), "lint"], cwd=built["comp"], capture_output=True, text=True,
                          encoding="utf-8", errors="replace")
     assert out.returncode == 0 and "0 error" in out.stdout + out.stderr, out.stdout + out.stderr
+
+
+def test_transitions_flash_without_shake(built):
+    data = json.loads(re.sub(r"^window\.REEL = |;\s*$", "", (built["comp"] / "data.js").read_text(encoding="utf-8")))
+    assert len(data["flashes"]) == 1 and "impacts" not in data
+    assert "shake" not in (built["comp"] / "index.html").read_text(encoding="utf-8")
+
+
+def test_single_scene_reel_builds(tmp_path):
+    """Tek sahne: geçiş yok, whoosh yok (eskiden asplit=0 ile ffmpeg hata veriyordu)."""
+    import conftest
+    src = tmp_path / "one"
+    src.mkdir()
+    conftest.make_clip(src / "scene1.mp4", 3.0)
+    conftest.make_voice(src / "voiceover.wav", 4.0)
+    conftest.make_logo(src / "logo.png")
+    font = tmp_path / "font.ttf"
+    font.write_bytes(b"x")
+    proj = tmp_path / "proj"
+    shutil.copytree(TEMPLATE, proj, ignore=shutil.ignore_patterns("__pycache__"))
+    (proj / "artifacts").mkdir()
+    scenes = [SCENES[0]]
+    tl, _ = build_timeline(scenes, fake_words(scenes), duration=4.0)
+    (proj / "artifacts" / "timeline.json").write_text(json.dumps(tl, ensure_ascii=False), encoding="utf-8")
+    out = subprocess.run([sys.executable, str(proj / "scripts" / "build_video.py"), f"--src={src}",
+                          f"--font={font}", "--no-render"], capture_output=True, text=True, encoding="utf-8")
+    assert out.returncode == 0, out.stdout + out.stderr
+    mix = proj / "assets" / "audio" / "mix.wav"
+    assert abs(float(probe(mix, "format=duration")) - 4.0) < 0.1
+
+
+def test_misspelled_option_stops_build(tmp_path):
+    out = subprocess.run([sys.executable, str(TEMPLATE / "scripts" / "build_video.py"), f"--src={tmp_path}",
+                          "--caption-colour=white", "--no-render"], capture_output=True, text=True, encoding="utf-8")
+    assert out.returncode != 0 and "--caption-color" in out.stdout + out.stderr
+
+
+def test_heavy_slowdown_warns(tmp_path):
+    import conftest
+    src = tmp_path / "slow"
+    src.mkdir()
+    conftest.make_clip(src / "scene1.mp4", 1.0)  # 1 sn klip, ~4 sn sahne: x4
+    conftest.make_voice(src / "voiceover.wav", 4.0)
+    conftest.make_logo(src / "logo.png")
+    font = tmp_path / "font.ttf"
+    font.write_bytes(b"x")
+    proj = tmp_path / "proj"
+    shutil.copytree(TEMPLATE, proj, ignore=shutil.ignore_patterns("__pycache__"))
+    (proj / "artifacts").mkdir()
+    tl, _ = build_timeline([SCENES[0]], fake_words([SCENES[0]]), duration=4.0)
+    (proj / "artifacts" / "timeline.json").write_text(json.dumps(tl, ensure_ascii=False), encoding="utf-8")
+    out = subprocess.run([sys.executable, str(proj / "scripts" / "build_video.py"), f"--src={src}",
+                          f"--font={font}", "--no-render"], capture_output=True, text=True, encoding="utf-8")
+    assert out.returncode == 0, out.stdout + out.stderr
+    assert "UYARI / WARN" in out.stdout and "scene1.mp4" in out.stdout

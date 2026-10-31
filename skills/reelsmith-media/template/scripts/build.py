@@ -1,4 +1,7 @@
-"""Ortak yardımcılar: timeline.json yükleme, sentez SFX (whoosh/boom/shimmer), konuşmada kısma (ducking) ifadesi."""
+"""Ortak yardımcılar: timeline.json yükleme, sentez SFX (whoosh/boom/shimmer), konuşmada kısma (ducking) ifadesi.
+
+Import edilince hiçbir dosya okumaz; timeline'ı load_timeline() okur.
+"""
 import json
 import wave
 from pathlib import Path
@@ -7,8 +10,14 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIO = ROOT / "assets" / "audio"
-TL = json.loads((ROOT / "artifacts" / "timeline.json").read_text(encoding="utf-8"))
+TIMELINE = ROOT / "artifacts" / "timeline.json"
 SR = 48000
+
+
+def load_timeline(path: Path = TIMELINE) -> dict:
+    if not path.is_file():
+        raise SystemExit(f"timeline.json yok / missing: {path}. Önce align.py'yi çalıştır.")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def save_wav(path: Path, x: np.ndarray) -> None:
@@ -62,9 +71,9 @@ def make_sfx() -> None:
     save_wav(AUDIO / "sfx_shimmer.wav", sh / np.abs(sh).max() * 0.8)
 
 
-def speech_regions(gap: float = 0.6) -> list[tuple[float, float]]:
+def speech_regions(words: list[dict], gap: float = 0.6) -> list[tuple[float, float]]:
     regs = []
-    for w in TL["words"]:
+    for w in words:
         if regs and w["start"] - regs[-1][1] < gap:
             regs[-1][1] = w["end"]
         else:
@@ -72,11 +81,11 @@ def speech_regions(gap: float = 0.6) -> list[tuple[float, float]]:
     return [(a, b) for a, b in regs]
 
 
-def duck_expr(duck_db: float = -14.0, ramp: float = 0.3) -> str:
+def duck_expr(words: list[dict], duck_db: float = -14.0, ramp: float = 0.3) -> str:
     """Konuşma bölgelerinde müziği duck_db kadar kısan volume ifadesi."""
     low = 10 ** (duck_db / 20)
     parts = []
-    for a, b in speech_regions():
+    for a, b in speech_regions(words):
         # bölge içinde 1, kenarlarda ramp ile yumuşak geçiş
         parts.append(f"clip(min((t-{a - ramp:.3f})/{ramp},({b + ramp:.3f}-t)/{ramp}),0,1)")
     inside = "max(" + ",".join(parts[:1] + ["0"]) + ")"

@@ -30,6 +30,8 @@ npx hyperframes skills                         # official HyperFrames skills for
 
 If OpenMontage is not in `~/Projects/OpenMontage`, set the `OPENMONTAGE_DIR` environment variable to its path.
 
+The installer checks out a tested OpenMontage commit (`195eab2`), not the moving `main` branch. To use another version set `OPENMONTAGE_REF` (a branch, tag or commit) before running it.
+
 **2. The skills**
 
 Copy `skills/reelsmith-media` and `skills/whisper-tr` into your tool's skills folder:
@@ -72,6 +74,8 @@ $OM/.venv/Scripts/python.exe -m pip install faster-whisper numpy   # Linux/macOS
 npm i -g hyperframes@0.8
 npx hyperframes skills                         # resmi HyperFrames skill'leri
 ```
+
+Kurulum OpenMontage'ın test edilmiş bir commit'ini (`195eab2`) indirir, değişen `main` dalını değil. Başka bir sürüm için kurulumdan önce `OPENMONTAGE_REF` ortam değişkenine dal, etiket ya da commit yaz.
 
 OpenMontage `~/Projects/OpenMontage` dışında bir yerdeyse `OPENMONTAGE_DIR` ortam değişkenine yolunu yaz. Sonra `skills/reelsmith-media` ve `skills/whisper-tr` klasörlerini aracının skill klasörüne kopyala:
 

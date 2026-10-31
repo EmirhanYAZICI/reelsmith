@@ -30,6 +30,8 @@ $ErrorActionPreference = 'Stop'
 
 $RepoUrl = 'https://github.com/EmirhanYAZICI/reelsmith-media'
 $OmUrl = 'https://github.com/calesthio/OpenMontage'
+# Tested OpenMontage commit. Override with $env:OPENMONTAGE_REF = '<branch|tag|sha>' (e.g. main) at your own risk.
+$OmRef = if ($env:OPENMONTAGE_REF) { $env:OPENMONTAGE_REF } else { '195eab24478dc9363326aec437aefc3701635ddf' }
 $Skills = @('reelsmith-media', 'whisper-tr')
 $AllAgents = @('claude', 'codex', 'opencode', 'cursor', 'antigravity')
 
@@ -100,7 +102,10 @@ if (-not $SkillsOnly) {
     }
 
     Say "OpenMontage: $OM"
-    if (Test-Path (Join-Path $OM 'AGENT_GUIDE.md')) { Ok 'found' } else { Run { git clone --depth 1 $OmUrl $OM } }
+    if (Test-Path (Join-Path $OM 'AGENT_GUIDE.md')) { Ok 'found' } else {
+        Run { git clone --filter=blob:none --no-checkout $OmUrl $OM }
+        Run { git -C $OM checkout -q $OmRef }
+    }
 
     $Vpy = Join-Path $OM '.venv\Scripts\python.exe'
     if (-not (Test-Path $Vpy)) {

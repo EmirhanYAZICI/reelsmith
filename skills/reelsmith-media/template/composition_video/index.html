@@ -190,7 +190,7 @@
 
     <script>
       (function () {
-        const D = window.ZEB;
+        const D = window.REEL;
         const DUR = D.duration;
         const W = 1080, H = 1920;
         const SEG = D.segments;
@@ -283,7 +283,7 @@
           if (i === 0) tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out" }, 0);
           else tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: TR, ease: "sine.inOut" }, a);
           // sahne boyunca tek, kesintisiz sinematik kamera hareketi (dolly + yanal kayma).
-          // Ani zoom/punch-in yok; her sahne farklı yönde süzülür. Kayma xPercent ile (sarsıntı x/y'yi kullanır).
+          // Ani zoom/punch-in yok; her sahne farklı yönde süzülür. Kayma xPercent/yPercent ile.
           const dir = i % 2 === 0 ? 1 : -1;
           const rise = i % 3 === 1 ? -1 : 1;
           tl.fromTo(id, { scale: 1.06, xPercent: -1.2 * dir, yPercent: 0.5 * rise },
@@ -293,13 +293,8 @@
         // kapanış: son kareye doğru karartma
         tl.to("#seg-" + (SEG.length - 1), { opacity: 0, duration: 1.4, ease: "power1.in" }, DUR - 1.5);
 
-        // sarsıntı (impact shake) + parlama
-        (D.impacts || []).forEach((im) => {
-          const seg = SEG.findIndex((s) => im.t >= s.vstart && im.t < s.vend);
-          if (seg < 0) return;
-          const id = "#seg-" + seg;
-          const steps = [[14, -10], [-12, 9], [9, 7], [-6, -5], [3, 2], [0, 0]];
-          steps.forEach((p, k) => tl.to(id, { x: p[0] * im.power, y: p[1] * im.power, duration: 0.05, ease: "none" }, im.t + k * 0.05));
+        // geçişte hafif parlama (sarsıntı yok: kural "ani hareket yok")
+        (D.flashes || []).forEach((im) => {
           tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.45 * im.power, duration: 0.08, ease: "none" }, im.t);
           tl.to("#flash", { opacity: 0, duration: 0.6, ease: "power2.out" }, im.t + 0.08);
         });

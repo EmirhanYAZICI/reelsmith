@@ -1,6 +1,6 @@
 {
   "name": "reelsmith-media",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Turn a voiceover, numbered scene clips, a scene script and a logo into a finished 1080x1920 / 30 fps Instagram Reel: local Whisper captions, HyperFrames edit, moving logo watermark, balanced audio mix.",
   "author": {
     "name": "Emirhan Yazıcı",

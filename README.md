@@ -169,7 +169,7 @@ Before anything slow starts, the agent runs a preflight check and tells you what
 python skills/reelsmith-media/template/scripts/check.py --src=~/Desktop/my-brand
 ```
 
-The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it.
+The finished `reel.mp4` is saved in `my-brand/` and in a `cikti/` folder next to it. An existing file with the same name is never overwritten; the new one is saved as `reel_2.mp4`.
 
 ---
 
@@ -449,7 +449,7 @@ Uzun işler başlamadan önce ajan bir ön kontrol çalıştırır ve eksik ya d
 python skills/reelsmith-media/template/scripts/check.py --src=~/Desktop/markam
 ```
 
-Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne kaydedilir.
+Bitmiş `reels.mp4` hem `markam/` içine hem de yanındaki `cikti/` klasörüne kaydedilir. Aynı adlı dosya varsa üzerine yazılmaz, yenisi `reels_2.mp4` olur.
 
 ### Nasıl çalışır
 

@@ -17,16 +17,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from common import (AUDIO_EXT, OptionError, caption_font, caption_options, group_clips, logo_options,  # noqa: E402
-                    scene_number, scene_texts)
+from common import (AUDIO_EXT, OptionError, caption_font, caption_options, check_unknown_options,  # noqa: E402
+                    get_opt, group_clips, logo_options, pick_voiceover, scene_number, scene_texts)
 
 GUIDE_NAMES = re.compile(r"rehber|guide|readme|agents|claude", re.I)
 results: list[tuple[str, str]] = []
 
 
 def opt(name: str, default: str = "") -> str:
-    v = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
-    return str(Path(v).expanduser()) if v.startswith("~") else v
+    return get_opt(sys.argv[1:], name, default)
 
 
 def ok(msg: str) -> None:
@@ -97,6 +96,7 @@ def check_tools() -> None:
 
 def check_options() -> None:
     try:
+        check_unknown_options(sys.argv[1:])
         caption_options(opt)
         logo_options(opt)
         ok("caption and logo options / altyazı ve logo seçenekleri")
@@ -157,11 +157,14 @@ def check_folder(src: Path) -> None:
 
     # seslendirme
     audio = sorted(p for p in files if p.suffix.lower() in AUDIO_EXT)
-    vo = Path(opt("vo")) if opt("vo") else next(
-        (p for p in audio if re.search(r"seslendirme|voice|\bvo\b", p.stem.lower())), audio[0] if audio else None)
-    if not vo or not vo.is_file():
-        fail("voiceover (.mp3/.wav/.m4a) not found / seslendirme bulunamadı")
-    else:
+    try:
+        vo = pick_voiceover(audio, opt("vo"))
+    except OptionError as e:
+        vo = None
+        fail(str(e))
+    if vo and not vo.is_file():
+        fail(f"voiceover not found / seslendirme bulunamadı: {vo}")
+    elif vo:
         info = probe(vo)
         has_audio = any(s.get("codec_type") == "audio" for s in (info or {}).get("streams", []))
         dur = float(((info or {}).get("format") or {}).get("duration") or 0)
@@ -170,7 +173,8 @@ def check_folder(src: Path) -> None:
         else:
             ok(f"voiceover {vo.name} {dur:.1f}s")
             if len(audio) > 1 and not opt("vo"):
-                warn(f"several audio files, using {vo.name}; pass --vo= to choose / birden fazla ses dosyası")
+                warn(f"several audio files, using {vo.name} (named as voiceover); others are not used / "
+                     "birden fazla ses dosyası, seslendirme adlı olan kullanılıyor")
 
     # logo
     pngs = sorted(p for p in files if p.suffix.lower() == ".png")

@@ -3,10 +3,87 @@
 build_video.py, check.py ve testler bunu kullanır. Dosya okumak dışında hiçbir şey yapmaz.
 """
 import re
+from difflib import get_close_matches
 from pathlib import Path
 
 VIDEO_EXT = {".mp4", ".mov", ".webm", ".mkv"}
 AUDIO_EXT = {".mp3", ".wav", ".m4a"}
+
+# ---------- komut satırı ----------
+# build_video.py ve check.py aynı seçenekleri kabul eder (SKILL.md iki komuta da aynı $STIL $LOGO'yu verir).
+VALUE_OPTIONS = ("src", "name", "vo", "logo", "font", "script",
+                 "caption-color", "caption-outline", "caption-style", "caption-anim",
+                 "renk", "kontur", "stil", "anim",  # eski Türkçe adlar
+                 "logo-mode", "logo-pos", "logo-size", "logo-moves")
+FLAG_OPTIONS = ("skip-prep", "no-render", "tools-only", "skip-tools", "json")
+
+
+def get_opt(argv: list[str], name: str, default: str = "") -> str:
+    """--isim=değer seçeneği. ~ ile başlayan yollar açılır (--src=~/Desktop/x)."""
+    v = next((a.split("=", 1)[1] for a in argv if a.startswith(f"--{name}=")), default)
+    return str(Path(v).expanduser()) if v.startswith("~") else v
+
+
+def check_unknown_options(argv: list[str]) -> None:
+    """Yazım hatalı seçenekler sessizce yok sayılmasın (--caption-colour=white sarı altyazı vermesin)."""
+    bad = []
+    for a in argv:
+        if not a.startswith("--"):
+            continue
+        key, eq, _ = a[2:].partition("=")
+        if (eq and key in VALUE_OPTIONS) or (not eq and key in FLAG_OPTIONS):
+            continue
+        if not eq and key in VALUE_OPTIONS:
+            bad.append(f"{a} (needs a value: --{key}=...)")
+            continue
+        near = get_close_matches(key, VALUE_OPTIONS + FLAG_OPTIONS, n=1, cutoff=0.6)
+        bad.append(f"{a}" + (f" (did you mean --{near[0]}?)" if near else ""))
+    if bad:
+        raise OptionError("Unknown option / bilinmeyen seçenek: " + "; ".join(bad))
+
+
+# ---------- seslendirme ----------
+VO_NAMES = re.compile(r"seslendirme|voice|narrat|anlat[iı]m|d[iı][sş]\s*ses|(?:^|[^a-z])vo(?:[^a-z]|$)", re.I)
+
+
+def pick_voiceover(audio: list[Path], given: str = "") -> Path:
+    """--vo verildiyse o; yoksa adı seslendirme/voice/vo olan dosya; klasörde tek ses dosyası varsa o.
+    Birden fazla ses dosyası var ve hiçbirinin adı seslendirme değilse tahmin etmez (müzik seçilebilir)."""
+    if given:
+        return Path(given)
+    named = [p for p in audio if VO_NAMES.search(p.stem)]
+    if len(named) == 1 or (named and len(audio) == len(named)):
+        return named[0]
+    if len(named) > 1:
+        raise OptionError(f"several voiceover-like files / birden fazla seslendirme adayı: {[p.name for p in named]}. "
+                          "Pass --vo=<file> / --vo= ile seç")
+    if len(audio) == 1:
+        return audio[0]
+    if not audio:
+        raise OptionError("voiceover (.mp3/.wav/.m4a) not found / seslendirme bulunamadı")
+    raise OptionError(f"several audio files and none is named voiceover / seslendirme hangisi belli değil: "
+                      f"{[p.name for p in audio]}. Pass --vo=<file> or put 'seslendirme' or 'voice' in its name")
+
+
+# ---------- güvenli kopya ----------
+def free_path(p: Path) -> Path:
+    """p varsa üzerine yazmamak için ad_2, ad_3 ... döner."""
+    if not p.exists():
+        return p
+    k = 2
+    while (q := p.with_name(f"{p.stem}_{k}{p.suffix}")).exists():
+        k += 1
+    return q
+
+
+# ---------- yavaşlatma ----------
+MAX_SLOW = 2.0  # bundan fazla yavaşlatılan klipte kare ara-değerleme artefaktı görülebilir
+
+
+def slow_factor(need: float, have: float) -> float:
+    """Klibin sahneyi doldurması için gereken yavaşlatma (1 = normal hız)."""
+    return max(1.0, need / have)
+
 
 # ---------- altyazı fontu ----------
 CALIBRI = Path(r"C:\Windows\Fonts\calibrib.ttf")

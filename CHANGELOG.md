@@ -2,6 +2,24 @@
 
 All notable changes to Reelsmith. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [2.2.0] - 2026-10-31
+
+### Fixed
+- Single-scene Reels no longer crash in the audio mix (`asplit=0` was rejected by ffmpeg when there was no transition).
+- Unknown or misspelled options (for example `--caption-colour=white`) now stop `build_video.py` and fail `check.py` with a suggestion, instead of being ignored.
+- The voiceover is no longer guessed: with several audio files and none named `seslendirme` / `voice` / `vo`, the scripts ask for `--vo=` instead of picking the first file (which could be music). `vo_final.mp3` style names are recognised.
+- The finished video never overwrites an existing file in the source or `cikti/` folder; it is saved as `name_2.mp4`.
+
+### Added
+- Warning when a clip is slowed down more than 2x to fill its scene (frame interpolation may show artifacts).
+- `align.py` warns when a scene's first word was not found in the voiceover (the scene start is estimated) and when the overall match rate is low. The timeline lists them in `unsure_scenes`.
+
+### Changed
+- The installers check out a tested OpenMontage commit instead of `main`; `OPENMONTAGE_REF` overrides it.
+- `build.py` and `build_video.py` do nothing on import; settings are read by `configure(argv)`, so tests can call them directly.
+- Scene transitions no longer shake the picture (rule: no sudden movement); only the crossfade and a soft flash remain.
+- Composition data is `window.REEL` (was `window.ZEB`, a leftover from the first project).
+
 ## [2.1.0] - 2026-10-30
 
 ### Added
