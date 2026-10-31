@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from common import (OptionError, caption_options, group_clips, logo_options, parse_color, plan_segments,
-                    scene_number, scene_texts)
+from common import (MAX_SLOW, OptionError, caption_options, check_unknown_options, free_path, get_opt,
+                    group_clips, logo_options, parse_color, pick_voiceover, plan_segments, scene_number,
+                    scene_texts, slow_factor)
 
 
 def opts(**kw):
@@ -113,3 +114,70 @@ def test_caption_font_falls_back_to_bundled_carlito():
     assert font.is_file()
     assert font in (common.CALIBRI, common.CARLITO)
     assert common.CARLITO.is_file()
+
+
+# ---------- komut satırı ----------
+def test_known_options_pass():
+    check_unknown_options(["--src=x", "--caption-color=white", "--renk=sari", "--logo-mode=move,ends",
+                           "--no-render", "--skip-prep", "folder"])
+
+
+@pytest.mark.parametrize("arg,hint", [
+    ("--caption-colour=white", "--caption-color"),
+    ("--logo-mod=corner", "--logo-mode"),
+    ("--no-rendr", "--no-render"),
+])
+def test_misspelled_option_fails_with_suggestion(arg, hint):
+    with pytest.raises(OptionError, match=hint):
+        check_unknown_options(["--src=x", arg])
+
+
+def test_value_option_without_value_fails():
+    with pytest.raises(OptionError, match="needs a value"):
+        check_unknown_options(["--src"])
+
+
+def test_get_opt_expands_home():
+    assert get_opt(["--src=~/x"], "src") == str(Path("~/x").expanduser())
+    assert get_opt([], "name", "d") == "d"
+
+
+# ---------- seslendirme seçimi ----------
+@pytest.mark.parametrize("names,pick", [
+    (["muzik.mp3", "seslendirme.mp3"], "seslendirme.mp3"),
+    (["a_music.mp3", "vo_final.wav"], "vo_final.wav"),
+    (["Voiceover TR.m4a", "bg.mp3"], "Voiceover TR.m4a"),
+    (["kayit.mp3"], "kayit.mp3"),  # tek ses dosyası: o
+])
+def test_pick_voiceover(names, pick):
+    assert pick_voiceover([Path(n) for n in names]).name == pick
+
+
+def test_pick_voiceover_does_not_guess_between_unnamed_files():
+    with pytest.raises(OptionError, match="--vo"):
+        pick_voiceover([Path("a_muzik.mp3"), Path("kayit.mp3")])
+
+
+def test_pick_voiceover_ignores_words_containing_vo():
+    with pytest.raises(OptionError):
+        pick_voiceover([Path("volume.mp3"), Path("bravo.mp3")])
+
+
+def test_pick_voiceover_given_wins_and_none_fails():
+    assert pick_voiceover([Path("a.mp3"), Path("b.mp3")], "b.mp3") == Path("b.mp3")
+    with pytest.raises(OptionError, match="not found"):
+        pick_voiceover([])
+
+
+# ---------- güvenli kopya / yavaşlatma ----------
+def test_free_path_never_returns_existing_file(tmp_path):
+    p = tmp_path / "reel.mp4"
+    assert free_path(p) == p
+    p.write_bytes(b"x")
+    (tmp_path / "reel_2.mp4").write_bytes(b"x")
+    assert free_path(p) == tmp_path / "reel_3.mp4"
+
+
+def test_slow_factor():
+    assert slow_factor(5, 10) == 1.0
+    assert slow_factor(40, 10) == 4.0 > MAX_SLOW

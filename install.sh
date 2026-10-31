@@ -22,6 +22,8 @@ set -euo pipefail
 
 REPO_URL="https://github.com/EmirhanYAZICI/reelsmith-media"
 OM_URL="https://github.com/calesthio/OpenMontage"
+# Tested OpenMontage commit. Override with OPENMONTAGE_REF=<branch|tag|sha> (e.g. main) at your own risk.
+OM_REF="${OPENMONTAGE_REF:-195eab24478dc9363326aec437aefc3701635ddf}"
 SKILLS=(reelsmith-media whisper-tr)
 ALL_AGENTS=(claude codex opencode cursor antigravity)
 
@@ -106,7 +108,8 @@ if [ "$DEPS" = 1 ]; then
   fi
 
   say "OpenMontage: $OM"
-  if [ -f "$OM/AGENT_GUIDE.md" ]; then ok "found"; else run git clone --depth 1 "$OM_URL" "$OM"; fi
+  if [ -f "$OM/AGENT_GUIDE.md" ]; then ok "found"
+  else run git clone --filter=blob:none --no-checkout "$OM_URL" "$OM" && run git -C "$OM" checkout -q "$OM_REF"; fi
 
   if [ -x "$OM/.venv/Scripts/python.exe" ]; then VPY="$OM/.venv/Scripts/python.exe"
   elif [ -x "$OM/.venv/bin/python" ]; then VPY="$OM/.venv/bin/python"

@@ -11,6 +11,9 @@ Kullanım:
 3. logoyu ve fontu kompozisyona kopyalar, composition_video/index.html'e video etiketlerini ve data.js'yi yazar
 4. ses miksajını yapar (seslendirme + kliplerin kendi sesi, konuşmada kısılır + geçişte whoosh)
 5. HyperFrames ile render alır, sesi ekleyip Instagram'a uygun kodlar, çıktıyı kopyalar
+   (aynı adlı dosya varsa üzerine yazmaz, ad_2.mp4 olarak kaydeder)
+
+Import edilince hiçbir şey yapmaz; ayarları configure(argv) okur (testler doğrudan çağırabilir).
 """
 import json
 import math
@@ -24,47 +27,68 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 import build  # noqa: E402  (SFX + miks fonksiyonları)
-from common import (OptionError, caption_font, caption_options, group_clips, logo_options,  # noqa: E402
-                    plan_segments)
+from common import (MAX_SLOW, OptionError, caption_font, caption_options, check_unknown_options,  # noqa: E402
+                    free_path, get_opt, group_clips, logo_options, pick_voiceover, plan_segments, slow_factor)
 
 COMP = ROOT / "composition_video"
 CLIPS = COMP / "assets" / "clips"
-def _opt(name: str, default: str = "") -> str:
-    """--isim=değer şeklindeki komut satırı seçeneği. ~ ile başlayan yollar açılır (--src=~/Desktop/x)."""
-    v = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(f"--{name}=")), default)
-    return str(Path(v).expanduser()) if v.startswith("~") else v
-
-
-if not _opt("src"):
-    raise SystemExit("Kaynak klasörü ver: --src=<klasör>  (seslendirme, sahne videoları, logo)")
-SRC_DIR = Path(_opt("src"))
-if not SRC_DIR.is_dir():
-    raise SystemExit(f"Kaynak klasör yok / source folder not found: {SRC_DIR}")
-# Seslendirme: --vo= verilmezse adında "seslendirme/voice/vo" geçen ses dosyası, yoksa ilk ses dosyası
-_audio = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() in {".mp3", ".wav", ".m4a"})
-VO = Path(_opt("vo")) if _opt("vo") else next(
-    (p for p in _audio if re.search(r"seslendirme|voice|\bvo\b", p.stem.lower())),
-    _audio[0] if _audio else SRC_DIR / "seslendirme.mp3")
-FINAL_NAME = _opt("name", "reels_final.mp4")
-# Logo (firma bağımsız): --logo= verilmezse adında "logo" geçen png, yoksa klasördeki tek png;
-# bulunamazsa script durur ve logo ister
-_pngs = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() == ".png")
-LOGO = Path(_opt("logo")) if _opt("logo") else next(
-    (p for p in _pngs if re.search(r"logo", p.stem.lower())), _pngs[0] if len(_pngs) == 1 else None)
 LOGO_W = 340  # logo-wrap taban genişliği (px); ekrandaki boyutu --logo-size belirler
-# Altyazı fontu: --font, yoksa Windows'taki Calibri Bold, yoksa repodaki Carlito Bold (aynı ölçüler)
-FONT = caption_font(_opt("font", ""))
-# Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. CAPTION-STYLES.md)
-# Logo: --logo-mode=move|corner|ends, --logo-pos, --logo-size, --logo-moves (bkz. REELS-REHBERI.md)
-try:
-    CAPTION = caption_options(_opt)
-    LOGO_OPT = logo_options(_opt)
-except OptionError as e:
-    raise SystemExit(str(e)) from None
 TR = 0.8  # geçiş süresi
-TL = build.TL
 FPS = 30
-N_SCENES = len(TL["scenes"])
+
+# configure() doldurur
+ARGV: list[str] = []
+TL: dict = {}
+N_SCENES = 0
+SRC_DIR = VO = LOGO = FONT = None
+FINAL_NAME = "reels_final.mp4"
+CAPTION: dict = {}
+LOGO_OPT: dict = {}
+WARNINGS: list[str] = []
+
+
+def _opt(name: str, default: str = "") -> str:
+    return get_opt(ARGV, name, default)
+
+
+def configure(argv: list[str], timeline: dict | None = None) -> None:
+    """Komut satırını okur, doğrular ve modül ayarlarını doldurur. Hata varsa SystemExit."""
+    global ARGV, TL, N_SCENES, SRC_DIR, VO, LOGO, FONT, FINAL_NAME, CAPTION, LOGO_OPT
+    ARGV = list(argv)
+    try:
+        check_unknown_options(ARGV)
+    except OptionError as e:
+        raise SystemExit(str(e)) from None
+    if not _opt("src"):
+        raise SystemExit("Kaynak klasörü ver: --src=<klasör>  (seslendirme, sahne videoları, logo)")
+    SRC_DIR = Path(_opt("src"))
+    if not SRC_DIR.is_dir():
+        raise SystemExit(f"Kaynak klasör yok / source folder not found: {SRC_DIR}")
+    # Seslendirme: --vo, yoksa adı seslendirme/voice/vo olan dosya, yoksa klasördeki tek ses dosyası.
+    # Birden fazla ses dosyası varsa tahmin etmez (müzik dosyası seçilmesin).
+    audio = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() in {".mp3", ".wav", ".m4a"})
+    try:
+        VO = pick_voiceover(audio, _opt("vo"))
+    except OptionError as e:
+        raise SystemExit(str(e)) from None
+    FINAL_NAME = _opt("name", "reels_final.mp4")
+    # Logo (firma bağımsız): --logo= verilmezse adında "logo" geçen png, yoksa klasördeki tek png;
+    # bulunamazsa script durur ve logo ister
+    pngs = sorted(p for p in SRC_DIR.iterdir() if p.suffix.lower() == ".png")
+    LOGO = Path(_opt("logo")) if _opt("logo") else next(
+        (p for p in pngs if re.search(r"logo", p.stem.lower())), pngs[0] if len(pngs) == 1 else None)
+    # Altyazı fontu: --font, yoksa Windows'taki Calibri Bold, yoksa repodaki Carlito Bold (aynı ölçüler)
+    FONT = caption_font(_opt("font", ""))
+    # Altyazı görünümü: yer/boyut sabit, sadece renk + yazı şekli + animasyon değişir (bkz. CAPTION-STYLES.md)
+    # Logo: --logo-mode=move|corner|ends, --logo-pos, --logo-size, --logo-moves (bkz. REELS-REHBERI.md)
+    try:
+        CAPTION = caption_options(_opt)
+        LOGO_OPT = logo_options(_opt)
+    except OptionError as e:
+        raise SystemExit(str(e)) from None
+    TL = timeline if timeline is not None else build.load_timeline()
+    N_SCENES = len(TL["scenes"])
+    WARNINGS.clear()
 
 
 def sh(cmd: list[str], what: str) -> str:
@@ -105,7 +129,7 @@ def prep_clip(i: int, s: dict) -> str:
     out = CLIPS / f"seg{i:02d}.mp4"
     need = s["vend"] - s["vstart"] + 0.2
     have = probe_duration(src)
-    f = max(1.0, need / have)
+    f = slow_factor(need, have)
     slow = f"setpts={f:.4f}*PTS,minterpolate=fps={FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1," if f > 1.05 else ""
     vf = (f"scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,{slow}fps={FPS},"
           "scale=1080:1920:flags=lanczos,"
@@ -114,7 +138,12 @@ def prep_clip(i: int, s: dict) -> str:
           "unsharp=5:5:0.4,format=yuv420p")
     sh(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-t", f"{need:.3f}", "-vf", vf, "-an",
         "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-g", "15", str(out)], f"klip hazırlama: {src.name}")
-    return f"seg{i:02d} <- {src.name} ({have:.1f}s, x{f:.2f} yavaş)"
+    msg = f"seg{i:02d} <- {src.name} ({have:.1f}s, x{f:.2f} yavaş)"
+    if f > MAX_SLOW:
+        WARNINGS.append(f"{src.name}: {have:.1f} sn'lik klip {need:.1f} sn'ye x{f:.1f} yavaşlatıldı, görüntüde "
+                        "bozulma olabilir. Daha uzun bir klip ya da o sahneye ikinci bir klip koy "
+                        f"(clip slowed x{f:.1f}, may show artifacts)")
+    return msg
 
 
 def has_audio(p: Path) -> bool:
@@ -161,15 +190,16 @@ def mix_audio(segs: list[dict]) -> Path:
         ms = int(s["vstart"] * 1000)
         fc.append(f"[{i + 1}:a]adelay={ms}|{ms},apad=whole_dur={dur}[c{i}]")
         bed.append(f"[c{i}]")
-    expr = build.duck_expr(duck_db=-9.0)
+    expr = build.duck_expr(TL["words"], duck_db=-9.0)
     fc.append("".join(bed) + f"amix=inputs={len(bed)}:normalize=0:duration=first,atrim=0:{dur},"
               f"loudnorm=I=-21:TP=-4:LRA=14,volume='{expr}':eval=frame[bed]")
     labels = ["[vo]", "[bed]"]
     k0 = len(segs) + 1
-    inputs += ["-i", str(build.AUDIO / "sfx_whoosh.wav")]
-    whooshes = [sc["start"] - 0.7 for sc in TL["scenes"][1:]]
-    fc.append(f"[{k0}:a]aresample={build.SR},aformat=channel_layouts=stereo,volume=-22dB,"
-              f"asplit={len(whooshes)}" + "".join(f"[w{j}]" for j in range(len(whooshes))))
+    whooshes = [sc["start"] - 0.7 for sc in TL["scenes"][1:]]  # tek sahnede geçiş yok, whoosh da yok
+    if whooshes:
+        inputs += ["-i", str(build.AUDIO / "sfx_whoosh.wav")]
+        fc.append(f"[{k0}:a]aresample={build.SR},aformat=channel_layouts=stereo,volume=-22dB,"
+                  f"asplit={len(whooshes)}" + "".join(f"[w{j}]" for j in range(len(whooshes))))
     for j, t in enumerate(whooshes):
         ms = int(max(0, t) * 1000)
         fc.append(f"[w{j}]adelay={ms}|{ms},apad=whole_dur={dur}[wd{j}]")
@@ -233,12 +263,12 @@ def write_composition(segs: list[dict]) -> None:
     html = re.sub(r'(data-composition-id="main"[^>]*data-duration=")[^"]*"',
                   lambda m: m.group(1) + f'{TL["duration"]:.3f}"', html)
     (COMP / "index.html").write_text(html, encoding="utf-8")
-    data = dict(TL, segments=segs, transition=TR, impacts=impacts(), caption=CAPTION, logo=LOGO_OPT)
-    (COMP / "data.js").write_text("window.ZEB = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
+    data = dict(TL, segments=segs, transition=TR, flashes=flashes(), caption=CAPTION, logo=LOGO_OPT)
+    (COMP / "data.js").write_text("window.REEL = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
 
 
-def impacts() -> list[dict]:
-    """Sahne geçişlerinde sarsıntı (ses efektindeki sub-bass vuruşlarıyla aynı an)."""
+def flashes() -> list[dict]:
+    """Sahne geçişlerinde hafif ışık parlaması. Sarsıntı yok (kural: ani hareket yok)."""
     return [{"t": sc["start"] + 0.05, "power": 0.8} for sc in TL["scenes"][1:]]
 
 
@@ -253,17 +283,23 @@ def run(cmd: list[str], cwd: Path | None = None) -> None:
                          "Klipler hazırsa --skip-prep ile kaldığın yerden devam edebilirsin.")
 
 
-def main() -> None:
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+def show_warnings() -> None:
+    for w in WARNINGS:
+        print("UYARI / WARN:", w)
+
+
+def main(argv: list[str] | None = None) -> None:
+    configure(sys.argv[1:] if argv is None else argv)
+    args = [a for a in ARGV if not a.startswith("--")]
     folder = Path(args[0]) if args else (SRC_DIR / "sahneler" if (SRC_DIR / "sahneler").is_dir() else SRC_DIR)
-    render = "--no-render" not in sys.argv
+    render = "--no-render" not in ARGV
     clips = find_clips(folder)
     segs = plan(clips)
     for n in range(1, N_SCENES + 1):
         print(f"Sahne {n}: {[Path(p).name for p in clips[n]]}")
 
     CLIPS.mkdir(parents=True, exist_ok=True)
-    if "--skip-prep" not in sys.argv:  # klipler hazırsa sadece kurgu + render
+    if "--skip-prep" not in ARGV:  # klipler hazırsa sadece kurgu + render
         for old in CLIPS.glob("seg*.*"):
             old.unlink()
         with ThreadPoolExecutor(3) as ex:
@@ -278,6 +314,7 @@ def main() -> None:
     build.make_sfx()
     mix = mix_audio(segs)
     print("miks:", mix)
+    show_warnings()
     if not render:
         return
 
@@ -294,8 +331,10 @@ def main() -> None:
          "-c:a", "aac", "-b:a", "256k", "-ar", "48000", "-ac", "2", "-shortest", "-movflags", "+faststart", str(final)])
     for dst in (SRC_DIR / FINAL_NAME, SRC_DIR.parent / "cikti" / FINAL_NAME):
         dst.parent.mkdir(exist_ok=True)
-        shutil.copy2(final, dst)
-        print("kopyalandı:", dst)
+        free = free_path(dst)  # kullanıcının dosyasının üzerine asla yazma
+        shutil.copy2(final, free)
+        print("kopyalandı:", free, "" if free == dst else f"({dst.name} zaten vardı, üzerine yazılmadı)")
+    show_warnings()
     print("\nçıktı kontrolü / output check:")  # FAIL olsa da video kopyalanmış olur; sonucu kullanıcıya söyle
     sys.exit(subprocess.run([sys.executable, str(Path(__file__).parent / "verify.py"), str(final),
                              f"--duration={TL['duration']:.3f}"]).returncode)

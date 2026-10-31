@@ -117,6 +117,7 @@ $PY scripts/verify.py renders/<isim>.mp4 --duration=<timeline süresi>
 Son video iki yere kopyalanır (script otomatik yapar):
 - kaynak klasör: `<proje klasörü>\<isim>.mp4`
 - kaynak klasörün bir üstündeki `cikti\` klasörü: `<üst klasör>\cikti\<isim>.mp4`. Klasör yoksa oluşturulur.
+- Aynı adlı dosya varsa üzerine yazılmaz: `<isim>_2.mp4`, `<isim>_3.mp4` ... olarak kaydedilir.
 
 ---
 
@@ -128,7 +129,7 @@ Son video iki yere kopyalanır (script otomatik yapar):
 ### Klipler (sahne videoları)
 - Her klip kendi sahnesinin seslendirme süresine **yavaşlatılır**. Takılma olmasın diye ffmpeg `minterpolate=fps=30:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` kullanılır.
 - 720x1280 kırp/ölçekle, sonra 1080x1920'ye büyüt. Hafif renk düzeltme (eq + colorbalance + unsharp).
-- Sahne geçişi: 0.8 sn crossfade + ışık süzmesi (light leak) + hafif sarsıntı/flash.
+- Sahne geçişi: 0.8 sn crossfade + ışık süzmesi (light leak) + hafif flash. Sarsıntı yok (ani hareket kuralı).
 
 ### Kamera hareketi
 - **Ani zoom / punch-in YOK.** Sahte kesme/geçiş gibi görünür.

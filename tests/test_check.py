@@ -67,3 +67,17 @@ def test_tilde_in_src_is_expanded(source_folder):
                           f"--font={home / 'font.ttf'}", "--skip-tools"],
                          capture_output=True, text=True, encoding="utf-8", env=env)
     assert out.returncode == 0, out.stdout + out.stderr
+
+
+def test_misspelled_option_fails(source_folder):
+    code, out = run_check(source_folder, "--caption-colour=white")
+    assert code == 1 and "--caption-color" in out
+
+
+def test_ambiguous_audio_fails(source_folder):
+    (source_folder / "voiceover.wav").rename(source_folder / "kayit.wav")
+    (source_folder / "muzik.wav").write_bytes((source_folder / "kayit.wav").read_bytes())
+    code, out = run_check(source_folder)
+    assert code == 1 and "--vo" in out
+    code, out = run_check(source_folder, f"--vo={source_folder / 'kayit.wav'}")
+    assert code == 0, out

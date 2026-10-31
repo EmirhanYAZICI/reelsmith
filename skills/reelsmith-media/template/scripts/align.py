@@ -4,6 +4,7 @@
   - words:  senaryodaki doğru yazımla, Whisper zamanlarıyla
   - scenes: her sahnenin başlangıç/bitiş saniyesi
   - chunks: 2-3 kelimelik altyazı blokları
+  - unsure_scenes: ilk kelimesi Whisper'la birebir eşleşmeyen sahneler (sınır tahmini)
 """
 import json
 import re
@@ -49,8 +50,10 @@ def build_timeline(scenes: list[str], hyp: list[dict], duration: float | None = 
     sm = SequenceMatcher(a=a, b=b, autojunk=False)
 
     times: list[tuple[float, float] | None] = [None] * len(ref)
+    sure: set[int] = set()  # zamanı doğrudan Whisper'dan gelen kelimeler
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag == "equal" or (tag == "replace" and i2 - i1 == j2 - j1):
+            sure.update(range(i1, i2))
             for k in range(i2 - i1):
                 h = hyp[j1 + k]
                 times[i1 + k] = (h["start"], h["end"])
@@ -81,7 +84,11 @@ def build_timeline(scenes: list[str], hyp: list[dict], duration: float | None = 
         e = total if si == n_sc - 1 else round(starts[si + 1] - 0.25, 3)
         scene_list.append({"index": si + 1, "start": s, "end": round(e, 3)})
 
-    # Altyazı blokları: 2-4 kelime, noktalama ve sahne sınırında böl
+    # Sahnenin ilk kelimesi eşleşmediyse sınır komşu kelimelerden tahmin edildi (ilk sahne hep 0'dan başlar)
+    first = [next(i for i, (_, si) in enumerate(ref) if si == s) for s in range(n_sc)]
+    unsure = [si + 1 for si in range(1, n_sc) if first[si] not in sure]
+
+    # Altyazı blokları: en fazla 3 kelime / 17 harf, noktalama ve sahne sınırında böl
     chunks, cur = [], []
     for i, w in enumerate(words):
         cur.append(i)
@@ -105,7 +112,8 @@ def build_timeline(scenes: list[str], hyp: list[dict], duration: float | None = 
     chunk_list = [{"start": words[c[0]]["start"], "end": words[c[-1]]["end"], "words": c} for c in merged]
 
     matched = sum(op[2] - op[1] for op in sm.get_opcodes() if op[0] == "equal")
-    return {"duration": total, "scenes": scene_list, "words": words, "chunks": chunk_list}, matched
+    return {"duration": total, "scenes": scene_list, "words": words, "chunks": chunk_list,
+            "unsure_scenes": unsure}, matched
 
 
 def main() -> None:
@@ -124,6 +132,13 @@ def main() -> None:
     for s in scene_list:
         print(f"Sahne {s['index']}: {s['start']:.2f} - {s['end']:.2f}  ({s['end'] - s['start']:.1f} sn)")
     print(f"altyazı bloğu: {len(chunk_list)}")
+    for n in tl["unsure_scenes"]:
+        print(f"UYARI / WARN: sahne {n}'in ilk kelimesi seslendirmede bulunamadı; sahne başlangıcı tahmini. "
+              "Metin ile seslendirme aynı mı kontrol et, snapshot'ta bu geçişe bak "
+              f"(scene {n} start is estimated)")
+    if len(ref) and matched / len(ref) < 0.6:
+        print(f"UYARI / WARN: kelimelerin sadece %{100 * matched // len(ref)}'i eşleşti; metin seslendirmeyle "
+              "uyuşmuyor olabilir (low match rate)")
 
 
 if __name__ == "__main__":

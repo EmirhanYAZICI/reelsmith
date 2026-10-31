@@ -59,3 +59,20 @@ def test_chunks_cover_every_word_once_and_stay_short():
 def test_empty_input_raises_clear_error(scenes, hyp):
     with pytest.raises(ValueError):
         build_timeline(scenes, hyp)
+
+
+def test_exact_match_has_no_unsure_scenes():
+    tl, _ = build_timeline(SCENES, fake_words(SCENES), duration=6.0)
+    assert tl["unsure_scenes"] == []
+
+
+def test_unmatched_first_word_marks_scene_unsure():
+    hyp = fake_words(SCENES)
+    del hyp[len(SCENES[0].split())]  # 2. sahnenin ilk kelimesi Whisper'da yok
+    tl, _ = build_timeline(SCENES, hyp, duration=6.0)
+    assert tl["unsure_scenes"] == [2]
+
+
+def test_chunks_have_at_most_three_words():
+    tl, _ = build_timeline(SCENES, fake_words(SCENES), duration=6.0)
+    assert all(1 <= len(c["words"]) <= 3 for c in tl["chunks"])
